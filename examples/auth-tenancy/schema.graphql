@@ -6,8 +6,8 @@ type User {
   name: String
   email: String
   password: PasswordState
-  permissions(where: PermissionWhereInput! = {}, orderBy: [PermissionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PermissionWhereUniqueInput): [Permission!]
-  permissionsCount(where: PermissionWhereInput! = {}): Int
+  tenants(where: TenantWhereInput! = {}, orderBy: [TenantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TenantWhereUniqueInput): [Tenant!]
+  can(tenant: TenantWhereUniqueInput!, operation: String!): Boolean!
 }
 
 type PasswordState {
@@ -27,7 +27,6 @@ input UserWhereInput {
   name: StringFilter
   email: StringFilter
   password: PasswordFilter
-  permissions: PermissionManyRelationFilter
 }
 
 input IDFilter {
@@ -73,12 +72,6 @@ input PasswordFilter {
   isSet: Boolean!
 }
 
-input PermissionManyRelationFilter {
-  every: PermissionWhereInput
-  some: PermissionWhereInput
-  none: PermissionWhereInput
-}
-
 input UserOrderByInput {
   id: OrderDirection
   name: OrderDirection
@@ -94,14 +87,6 @@ input UserUpdateInput {
   name: String
   email: String
   password: String
-  permissions: PermissionRelateToManyForUpdateInput
-}
-
-input PermissionRelateToManyForUpdateInput {
-  disconnect: [PermissionWhereUniqueInput!]
-  set: [PermissionWhereUniqueInput!]
-  create: [PermissionCreateInput!]
-  connect: [PermissionWhereUniqueInput!]
 }
 
 input UserUpdateArgs {
@@ -113,21 +98,14 @@ input UserCreateInput {
   name: String
   email: String
   password: String
-  permissions: PermissionRelateToManyForCreateInput
-}
-
-input PermissionRelateToManyForCreateInput {
-  create: [PermissionCreateInput!]
-  connect: [PermissionWhereUniqueInput!]
 }
 
 type Permission {
   id: ID!
-  title: String
   tenant: Tenant
-  operation: PermissionOperationType
   delegates(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserWhereUniqueInput): [User!]
   delegatesCount(where: UserWhereInput! = {}): Int
+  operation: PermissionOperationType
 }
 
 enum PermissionOperationType {
@@ -147,8 +125,14 @@ input PermissionWhereInput {
   NOT: [PermissionWhereInput!]
   id: IDFilter
   tenant: TenantWhereInput
-  operation: PermissionOperationTypeNullableFilter
   delegates: UserManyRelationFilter
+  operation: PermissionOperationTypeNullableFilter
+}
+
+input UserManyRelationFilter {
+  every: UserWhereInput
+  some: UserWhereInput
+  none: UserWhereInput
 }
 
 input PermissionOperationTypeNullableFilter {
@@ -158,12 +142,6 @@ input PermissionOperationTypeNullableFilter {
   not: PermissionOperationTypeNullableFilter
 }
 
-input UserManyRelationFilter {
-  every: UserWhereInput
-  some: UserWhereInput
-  none: UserWhereInput
-}
-
 input PermissionOrderByInput {
   id: OrderDirection
   operation: OrderDirection
@@ -171,8 +149,8 @@ input PermissionOrderByInput {
 
 input PermissionUpdateInput {
   tenant: TenantRelateToOneForUpdateInput
-  operation: PermissionOperationType
   delegates: UserRelateToManyForUpdateInput
+  operation: PermissionOperationType
 }
 
 input TenantRelateToOneForUpdateInput {
@@ -195,8 +173,8 @@ input PermissionUpdateArgs {
 
 input PermissionCreateInput {
   tenant: TenantRelateToOneForCreateInput
-  operation: PermissionOperationType
   delegates: UserRelateToManyForCreateInput
+  operation: PermissionOperationType
 }
 
 input TenantRelateToOneForCreateInput {
@@ -215,8 +193,9 @@ type Tenant {
   parent: Tenant
   children(where: TenantWhereInput! = {}, orderBy: [TenantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TenantWhereUniqueInput): [Tenant!]
   childrenCount(where: TenantWhereInput! = {}): Int
-  permissions(where: PermissionWhereInput! = {}, orderBy: [PermissionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PermissionWhereUniqueInput): [Permission!]
-  permissionsCount(where: PermissionWhereInput! = {}): Int
+  ancestors(where: TenantWhereInput! = {}, orderBy: [TenantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TenantWhereUniqueInput): [Tenant!]
+  descendants(where: TenantWhereInput! = {}, orderBy: [TenantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TenantWhereUniqueInput): [Tenant!]
+  users(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserWhereUniqueInput): [User!]
 }
 
 input TenantWhereUniqueInput {
@@ -232,7 +211,6 @@ input TenantWhereInput {
   title: StringFilter
   parent: TenantWhereInput
   children: TenantManyRelationFilter
-  permissions: PermissionManyRelationFilter
 }
 
 input TenantManyRelationFilter {
@@ -250,7 +228,6 @@ input TenantUpdateInput {
   title: String
   parent: TenantRelateToOneForUpdateInput
   children: TenantRelateToManyForUpdateInput
-  permissions: PermissionRelateToManyForUpdateInput
 }
 
 input TenantRelateToManyForUpdateInput {
@@ -269,7 +246,6 @@ input TenantCreateInput {
   title: String
   parent: TenantRelateToOneForCreateInput
   children: TenantRelateToManyForCreateInput
-  permissions: PermissionRelateToManyForCreateInput
 }
 
 input TenantRelateToManyForCreateInput {

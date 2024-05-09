@@ -1,5 +1,5 @@
 import { SelectFieldConfig } from '@keystone-6/core/fields'
-import { BaseListTypeInfo, KeystoneContext } from "@keystone-6/core/types";
+import { BaseListTypeInfo } from "@keystone-6/core/types";
 
 export type Session = {
     itemId: string;
@@ -7,11 +7,6 @@ export type Session = {
       name: string;
       email: string;
     };
-  };
-  
-  export type Context = {
-    session?: Session;
-    context: KeystoneContext;
   };
   
   export type Ops = "C" | "R" | "U" | "D";

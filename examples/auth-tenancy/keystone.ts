@@ -2,11 +2,11 @@ import { config } from '@keystone-6/core'
 import { statelessSessions } from '@keystone-6/core/session'
 import { createAuth } from '@keystone-6/auth'
 import { fixPrismaPath } from '../example-utils'
-import lists from './schema'
+import lists from './src/schema'
+import { Session } from './src/schema/types'
 import { type TypeInfo } from '.keystone/types'
 import * as dotenv from "dotenv";
-import seedData from './seed-data'
-import { Session } from './schema/types'
+import seedData from './src/seed'
 
 dotenv.config()
 
