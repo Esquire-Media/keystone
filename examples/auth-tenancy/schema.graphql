@@ -7,7 +7,6 @@ type User {
   email: String
   password: PasswordState
   tenants(where: TenantWhereInput! = {}, orderBy: [TenantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TenantWhereUniqueInput): [Tenant!]
-  can(tenant: TenantWhereUniqueInput!, operation: String!): Boolean!
 }
 
 type PasswordState {
