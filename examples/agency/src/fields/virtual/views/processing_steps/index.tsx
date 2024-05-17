@@ -7,7 +7,7 @@ import { DrawerController } from '@keystone-ui/modals'
 import { FieldProps } from '@keystone-6/core/types';
 import { FieldContainer, FieldDescription, FieldLabel } from '@keystone-ui/fields';
 import { controller } from '@keystone-6/core/fields/types/virtual/views';
-import { AutocompleteSelect, OrderableList, type Item } from '../../../../primatives'
+import { OrderableList, type Item } from '../../../../primatives'
 import { Fragment, useState } from 'react';
 import { useList } from '@keystone-6/core/admin-ui/context';
 import { CreateItemDrawer } from '@keystone-6/core/admin-ui/components';
@@ -17,18 +17,11 @@ export const Field = (props: FieldProps<typeof controller>) => {
   const metaProps = {
     foreignListKey: "TargetingProcessingStep", // The foreign list linked to this field
     foreignLabelPath: "id", // The foreign list linked to this field
-    hideCreate: false,
   };
-  const foreignList = useList(metaProps.foreignListKey)
   // const localList = useList(field.listKey)
 
   // Initialize state with the provided value, defaulting to an empty array
   const value = typeof props.value === 'object' ? props.value : [];
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
-  function onCreate(value: any) {
-    console.log(value)
-  }
 
   return (
     <FieldContainer>
@@ -44,40 +37,10 @@ export const Field = (props: FieldProps<typeof controller>) => {
               foreignLabelPath={metaProps.foreignLabelPath}
               onChange={props.onChange}
               value={value}
+
             />
           ) : null}
-
-          <Stack across gap="small">
-            {props.onChange !== undefined && !metaProps.hideCreate && (
-              <Button
-                size="small"
-                disabled={isDrawerOpen}
-                onClick={() => {
-                  setIsDrawerOpen(true)
-                }}
-              >
-                Create related {foreignList.singular}
-              </Button>
-            )}
-          </Stack>
         </Stack>
-        {props.onChange !== undefined && (
-          <DrawerController isOpen={isDrawerOpen}>
-            <CreateItemDrawer
-              listKey={foreignList.key}
-              onClose={() => {
-                setIsDrawerOpen(false)
-              }}
-              onCreate={val => {
-                setIsDrawerOpen(false)
-                onCreate({
-                  ...value,
-                  value: val,
-                })
-              }}
-            />
-          </DrawerController>
-        )}
       </Fragment>
     </FieldContainer >
   );
@@ -91,6 +54,8 @@ function ComponentWrapper(props: {
 }) {
   // Formatting the value to be typeof Item[]
   const value: Item[] = props.value.map((v) => ({ label: v[props.foreignLabelPath], value: v.id }))
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const foreignList = useList(props.foreignListKey)
 
   /* Handlers */
   // Adds items only if they do not already share a label
@@ -106,16 +71,38 @@ function ComponentWrapper(props: {
 
   return (
     <div>
-      <AutocompleteSelect
-        listKey={props.foreignListKey}
-        fieldPath={props.foreignLabelPath}
-        onChange={addItem}
-        ignoreValues={value.map((v) => v.label)}
-      />
       <OrderableList
         items={value.map(i => ({ ...i, key: i.label }))}
         onChange={onChange}
       />
+
+      <Stack across gap="small">
+        {props.onChange !== undefined && (
+          <Button
+            size="small"
+            disabled={isDrawerOpen}
+            onClick={() => {
+              setIsDrawerOpen(true)
+            }}
+          >
+            Create related {foreignList.label}
+          </Button>
+        )}
+      </Stack>
+      {props.onChange !== undefined && (
+        <DrawerController isOpen={isDrawerOpen}>
+          <CreateItemDrawer
+            listKey={props.foreignListKey}
+            onClose={() => {
+              setIsDrawerOpen(false)
+            }}
+            onCreate={val => {
+              setIsDrawerOpen(false)
+              addItem(value)
+            }}
+          />
+        </DrawerController>
+      )}
     </div>
   )
 }
