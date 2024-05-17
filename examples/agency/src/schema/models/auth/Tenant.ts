@@ -18,7 +18,7 @@ export const Tenant = list({
     item: {
       create: ({ context, inputData }) => {
         if (!context.session) return false; // Deny unsessioned queries
-        if (isGlobalAdmin(context)) return {}; // Allow access to global admins.
+        if (isGlobalAdmin(context)) return true; // Allow access to global admins.
         // Ensure the parent tenant has a valid connection.
         if (!inputData.parent?.connect) return false;
         // Check if the user has permission to create under the parent tenant.
@@ -38,7 +38,7 @@ export const Tenant = list({
       },
       delete: ({ context, item }) => {
         if (!context.session) return false; // Deny unsessioned queries
-        if (isGlobalAdmin(context)) return {}; // Allow access to global admins.
+        if (isGlobalAdmin(context)) return true; // Allow access to global admins.
         // Ensure the tenant has a parent to authorize the delete operation.
         if (!item.parentId) return false;
         // Check if the user has delete permission on the parent tenant.

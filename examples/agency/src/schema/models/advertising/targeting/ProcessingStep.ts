@@ -18,7 +18,7 @@ export const TargetingProcessingStep = list({
     item: {
       create: async ({ context, inputData }) => {
         if (!context.session) return false; // Deny unsessioned queries
-        if (isGlobalAdmin(context)) return {}; // Allow access to global admins.
+        if (isGlobalAdmin(context)) return true; // Allow access to global admins.
         // Ensure the owning advertiser has a valid connection.
         if (!inputData.audience?.connect) return false;
         const tenant = (await context.query.Audience.findOne({
@@ -41,7 +41,7 @@ export const TargetingProcessingStep = list({
       },
       delete: async ({ context, item }) => {
         if (!context.session) return false; // Deny unsessioned queries
-        if (isGlobalAdmin(context)) return {}; // Allow access to global admins.
+        if (isGlobalAdmin(context)) return true; // Allow access to global admins.
         if (!item.audienceId) return false;
         const tenant = (await context.query.Audience.findOne({
           where: { id: item.audienceId.toString() },

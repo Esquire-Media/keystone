@@ -17,7 +17,7 @@ export const Advertiser = list({
     item: {
       create: ({ context, inputData }) => {
         if (!context.session) return false; // Deny unsessioned queries
-        if (isGlobalAdmin(context)) return {}; // Allow access to global admins.
+        if (isGlobalAdmin(context)) return true; // Allow access to global admins.
         // Ensure the owning tenant has a valid connection.
         if (!inputData.tenant?.connect) return false;
         // Check if session is authorized to create things for the current tenant.
@@ -37,7 +37,7 @@ export const Advertiser = list({
       },
       delete: ({ context, item }) => {
         if (!context.session) return false; // Deny unsessioned queries
-        if (isGlobalAdmin(context)) return {}; // Allow access to global admins.
+        if (isGlobalAdmin(context)) return true; // Allow access to global admins.
         // Ensure the tenant has a tenant to authorize the delete operation.
         if (!item.tenantId) return false;
         // Check if the user has delete permission on the tenant tenant.

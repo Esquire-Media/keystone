@@ -617,12 +617,18 @@ importers:
       '@keystone-6/fields-query-builder':
         specifier: workspace:^
         version: link:../../packages/fields-query-builder
+      '@keystone-ui/button':
+        specifier: workspace:^
+        version: link:../../design-system/packages/button
       '@keystone-ui/core':
         specifier: workspace:^
         version: link:../../design-system/packages/core
       '@keystone-ui/fields':
         specifier: workspace:^
         version: link:../../design-system/packages/fields
+      '@keystone-ui/modals':
+        specifier: workspace:^
+        version: link:../../design-system/packages/modals
       '@mapbox/mapbox-gl-draw':
         specifier: ^1.4.3
         version: 1.4.3
