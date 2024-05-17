@@ -93,7 +93,7 @@ export const Audience = list({
         });
       },
       ui: {
-        views: './src/fields/virtual/views/tags', // Path to views file for custom field UI
+        views: './src/fields/virtual/views/tags_color', // Path to views file for custom field UI
         query: '{ id title }',
       },
       hooks: {

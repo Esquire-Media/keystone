@@ -45,6 +45,7 @@ model Tenant {
 model Tag {
   id                   String        @id @default(cuid())
   title                String        @unique @default("")
+  color                String        @default("")
   from_AudienceTag_tag AudienceTag[] @relation("AudienceTag_tag")
 }
 

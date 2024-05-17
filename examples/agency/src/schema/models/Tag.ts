@@ -6,6 +6,7 @@ export const Tag = list({
   access: allowLoggedIn(),
   fields: {
     title: text({ isIndexed: 'unique' }),
+    color: text(),
   },
   hooks: {
     beforeOperation: async ({ item, operation, context }) => {

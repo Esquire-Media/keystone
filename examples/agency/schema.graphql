@@ -263,6 +263,7 @@ input TenantRelateToManyForCreateInput {
 type Tag {
   id: ID!
   title: String
+  color: String
 }
 
 input TagWhereUniqueInput {
@@ -276,15 +277,18 @@ input TagWhereInput {
   NOT: [TagWhereInput!]
   id: IDFilter
   title: StringFilter
+  color: StringFilter
 }
 
 input TagOrderByInput {
   id: OrderDirection
   title: OrderDirection
+  color: OrderDirection
 }
 
 input TagUpdateInput {
   title: String
+  color: String
 }
 
 input TagUpdateArgs {
@@ -294,6 +298,7 @@ input TagUpdateArgs {
 
 input TagCreateInput {
   title: String
+  color: String
 }
 
 type Advertiser {
