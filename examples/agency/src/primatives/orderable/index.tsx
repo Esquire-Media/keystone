@@ -5,6 +5,7 @@ import { jsx } from '@keystone-ui/core';
 import {
   DragDropContext,
   Draggable,
+  DraggableProvided,
   Droppable,
   DropResult,
 } from '@hello-pangea/dnd';
@@ -14,6 +15,7 @@ import { Trash2Icon } from "../../../../../design-system/packages/icons/src";
 type Props = {
   items: OrderableItem[];
   onChange: (items: Item[]) => void
+  onClick?: (item: Item) => void;
 }
 
 export const OrderableList = (props: Props) => {
@@ -54,7 +56,8 @@ export const OrderableList = (props: Props) => {
                   <Orderable
                     provided={provided}
                     item={item}
-                    onClick={() => props.onChange(
+                    onClick={props.onClick}
+                    onDelete={() => props.onChange(
                       props.items.filter((v: any) => v.key !== item.key)
                     )}
                   />
@@ -70,8 +73,13 @@ export const OrderableList = (props: Props) => {
   );
 }
 
-function Orderable(props: any) {
-  const { provided, item, onClick } = props
+function Orderable(props: {
+  provided: DraggableProvided;
+  item: Item;
+  onClick?: (item: Item) => void;
+  onDelete: () => void;
+}) {
+  const { provided, item, onClick, onDelete } = props
 
   return (
     <div
@@ -85,11 +93,11 @@ function Orderable(props: any) {
         {svg_handle}
       </div>
       {/* Display the item's title */}
-      <div className="text clickable">
+      <div className={`text ${onClick && "clickable"}`} onClick={onClick ? () => onClick(item) : undefined}>
         {item.label}
       </div>
       {/* Delete button */}
-      <button onClick={onClick} className="icon clickable centered trash">
+      <button onClick={onDelete} className="icon clickable centered trash">
         <Trash2Icon size="small" />
       </button>
     </div>

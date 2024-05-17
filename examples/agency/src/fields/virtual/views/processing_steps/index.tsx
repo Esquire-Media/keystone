@@ -68,6 +68,7 @@ function ComponentWrapper(props: {
       <OrderableList
         items={value.map(i => ({ ...i, key: i.label }))}
         onChange={onChange}
+        onClick={console.log}
       />
 
       <Stack across gap="small">
