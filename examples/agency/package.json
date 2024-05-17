@@ -17,6 +17,7 @@
     "@keystone-ui/button": "workspace:^",
     "@keystone-ui/core": "workspace:^",
     "@keystone-ui/fields": "workspace:^",
+    "@keystone-ui/icons": "workspace:^",
     "@keystone-ui/modals": "workspace:^",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",

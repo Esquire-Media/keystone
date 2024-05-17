@@ -41,7 +41,9 @@ function ComponentWrapper(props: {
   foreignLabelPath: string;
   value: any[];
   onChange: (values: any) => void;
+  select?: boolean;
 }) {
+  const { select = true } = props;
   // Formatting the value to be typeof Item[]
   const value: Item[] = props.value.map((v) => ({ label: v[props.foreignLabelPath], value: v.id }))
 
@@ -59,12 +61,14 @@ function ComponentWrapper(props: {
 
   return (
     <div>
-      <AutocompleteSelect
-        listKey={props.foreignListKey}
-        fieldPath={props.foreignLabelPath}
-        onChange={addItem}
-        ignoreValues={value.map((v) => v.label)}
-      />
+      {select &&
+        <AutocompleteSelect
+          listKey={props.foreignListKey}
+          fieldPath={props.foreignLabelPath}
+          onChange={addItem}
+          ignoreValues={value.map((v) => v.label)}
+        />
+      }
       <OrderableList
         items={value.map(i => ({ ...i, key: i.label }))}
         onChange={onChange}
