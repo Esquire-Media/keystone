@@ -64,4 +64,11 @@ export const Advertiser = list({
       }
     }),
   },
+  ui: {
+    hideCreate: true,
+    hideDelete: true,
+    listView: {
+      initialColumns: ["title", "tenant"],
+    },
+  },
 });

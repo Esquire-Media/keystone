@@ -2,8 +2,10 @@ import { KeystoneContext } from "@keystone-6/core/types";
 import seedAdmin from './admin';
 import seedUsers from './users';
 import seedTenants from './tenants';
+import seedTags from './tags';
 import seedPermissions from './permissions';
 import seedAdvertisers from './advertisers';
+import seedTargetingDataSources from './targetdatasources';
 
 
 /**
@@ -19,8 +21,10 @@ export default async function seedDatabase(context: KeystoneContext) {
   await seedAdmin(context);
   await seedUsers(context);
   await seedTenants(context);
+  await seedTags(context);
   await seedPermissions(context);
   await seedAdvertisers(context);
+  await seedTargetingDataSources(context);
 
   console.log(`🌱 Database seeding process completed.`);
 }

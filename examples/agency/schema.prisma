@@ -42,14 +42,87 @@ model Tenant {
   @@index([parentId])
 }
 
+model Tag {
+  id                   String        @id @default(cuid())
+  title                String        @unique @default("")
+  from_AudienceTag_tag AudienceTag[] @relation("AudienceTag_tag")
+}
+
 model Advertiser {
-  id       String  @id @default(cuid())
-  title    String  @unique @default("")
-  tenant   Tenant? @relation("Advertiser_tenant", fields: [tenantId], references: [id])
-  tenantId String? @map("tenant")
-  meta     String?
-  oneView  String?
-  xandr    String?
+  id                       String     @id @default(cuid())
+  title                    String     @unique @default("")
+  tenant                   Tenant?    @relation("Advertiser_tenant", fields: [tenantId], references: [id])
+  tenantId                 String?    @map("tenant")
+  meta                     String?
+  oneView                  String?
+  xandr                    String?
+  from_Audience_advertiser Audience[] @relation("Audience_advertiser")
 
   @@index([tenantId])
+}
+
+model TargetingDataSource {
+  id                       String     @id @default(cuid())
+  dataType                 String?
+  title                    String     @unique @default("")
+  filtering                String     @default("")
+  from_Audience_dataSource Audience[] @relation("Audience_dataSource")
+}
+
+model TargetingGeoFrame {
+  id      String  @id @default(cuid())
+  ESQID   String  @default("")
+  title   String  @default("")
+  polygon String?
+  street  String  @default("")
+  city    String  @default("")
+  state   String  @default("")
+  zipCode String  @default("")
+}
+
+model TargetingProcessingStep {
+  id           String    @id @default(cuid())
+  audience     Audience? @relation("TargetingProcessingStep_audience", fields: [audienceId], references: [id])
+  audienceId   String?   @map("audience")
+  sort         Int?
+  outputType   String?
+  customCoding String    @default("")
+
+  @@index([audienceId])
+}
+
+model Audience {
+  id                        String                    @id @default(cuid())
+  advertiser                Advertiser?               @relation("Audience_advertiser", fields: [advertiserId], references: [id])
+  advertiserId              String?                   @map("advertiser")
+  status                    Boolean                   @default(true)
+  rebuild                   Int?                      @default(1)
+  rebuildUnit               String?                   @default("months")
+  TTL_Length                Int?                      @default(1)
+  TTL_Unit                  String?                   @default("months")
+  dataSource                TargetingDataSource?      @relation("Audience_dataSource", fields: [dataSourceId], references: [id])
+  dataSourceId              String?                   @map("dataSource")
+  dataFilter                String?
+  processes                 TargetingProcessingStep[] @relation("TargetingProcessingStep_audience")
+  meta                      String?
+  oneView                   String?
+  xandr                     String?
+  from_AudienceTag_audience AudienceTag[]             @relation("AudienceTag_audience")
+
+  @@index([advertiserId])
+  @@index([dataSourceId])
+}
+
+model AudienceTag {
+  id         String    @id @default(cuid())
+  audience   Audience? @relation("AudienceTag_audience", fields: [audienceId], references: [id])
+  audienceId String?   @map("audience")
+  tag        Tag?      @relation("AudienceTag_tag", fields: [tagId], references: [id])
+  tagId      String?   @map("tag")
+  order      Int       @default(0)
+
+  @@unique([audienceId, tagId])
+  @@unique([audienceId, order])
+  @@index([audienceId])
+  @@index([tagId])
 }

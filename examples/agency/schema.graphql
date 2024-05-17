@@ -260,6 +260,42 @@ input TenantRelateToManyForCreateInput {
   connect: [TenantWhereUniqueInput!]
 }
 
+type Tag {
+  id: ID!
+  title: String
+}
+
+input TagWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input TagWhereInput {
+  AND: [TagWhereInput!]
+  OR: [TagWhereInput!]
+  NOT: [TagWhereInput!]
+  id: IDFilter
+  title: StringFilter
+}
+
+input TagOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+}
+
+input TagUpdateInput {
+  title: String
+}
+
+input TagUpdateArgs {
+  where: TagWhereUniqueInput!
+  data: TagUpdateInput!
+}
+
+input TagCreateInput {
+  title: String
+}
+
 type Advertiser {
   id: ID!
   title: String
@@ -329,6 +365,439 @@ input AdvertiserCreateInput {
   xandr: String
 }
 
+type TargetingDataSource {
+  id: ID!
+  dataType: TargetingDataSourceDataTypeType
+  title: String
+  filtering: String
+}
+
+enum TargetingDataSourceDataTypeType {
+  addresses
+  device_ids
+  polygons
+}
+
+input TargetingDataSourceWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input TargetingDataSourceWhereInput {
+  AND: [TargetingDataSourceWhereInput!]
+  OR: [TargetingDataSourceWhereInput!]
+  NOT: [TargetingDataSourceWhereInput!]
+  id: IDFilter
+  dataType: TargetingDataSourceDataTypeTypeNullableFilter
+  title: StringFilter
+  filtering: StringFilter
+}
+
+input TargetingDataSourceDataTypeTypeNullableFilter {
+  equals: TargetingDataSourceDataTypeType
+  in: [TargetingDataSourceDataTypeType!]
+  notIn: [TargetingDataSourceDataTypeType!]
+  not: TargetingDataSourceDataTypeTypeNullableFilter
+}
+
+input TargetingDataSourceOrderByInput {
+  id: OrderDirection
+  dataType: OrderDirection
+  title: OrderDirection
+  filtering: OrderDirection
+}
+
+input TargetingDataSourceUpdateInput {
+  dataType: TargetingDataSourceDataTypeType
+  title: String
+  filtering: String
+}
+
+input TargetingDataSourceUpdateArgs {
+  where: TargetingDataSourceWhereUniqueInput!
+  data: TargetingDataSourceUpdateInput!
+}
+
+input TargetingDataSourceCreateInput {
+  dataType: TargetingDataSourceDataTypeType
+  title: String
+  filtering: String
+}
+
+type TargetingGeoFrame {
+  id: ID!
+  ESQID: String
+  title: String
+  polygon: JSON
+  street: String
+  city: String
+  state: String
+  zipCode: String
+}
+
+input TargetingGeoFrameWhereUniqueInput {
+  id: ID
+}
+
+input TargetingGeoFrameWhereInput {
+  AND: [TargetingGeoFrameWhereInput!]
+  OR: [TargetingGeoFrameWhereInput!]
+  NOT: [TargetingGeoFrameWhereInput!]
+  id: IDFilter
+  ESQID: StringFilter
+  title: StringFilter
+  street: StringFilter
+  city: StringFilter
+  state: StringFilter
+  zipCode: StringFilter
+}
+
+input TargetingGeoFrameOrderByInput {
+  id: OrderDirection
+  ESQID: OrderDirection
+  title: OrderDirection
+  street: OrderDirection
+  city: OrderDirection
+  state: OrderDirection
+  zipCode: OrderDirection
+}
+
+input TargetingGeoFrameUpdateInput {
+  ESQID: String
+  title: String
+  polygon: JSON
+  street: String
+  city: String
+  state: String
+  zipCode: String
+}
+
+input TargetingGeoFrameUpdateArgs {
+  where: TargetingGeoFrameWhereUniqueInput!
+  data: TargetingGeoFrameUpdateInput!
+}
+
+input TargetingGeoFrameCreateInput {
+  ESQID: String
+  title: String
+  polygon: JSON
+  street: String
+  city: String
+  state: String
+  zipCode: String
+}
+
+type TargetingProcessingStep {
+  id: ID!
+  audience: Audience
+  sort: Int
+  outputType: TargetingProcessingStepOutputTypeType
+  customCoding: String
+}
+
+enum TargetingProcessingStepOutputTypeType {
+  addresses
+  device_ids
+  polygons
+}
+
+input TargetingProcessingStepWhereUniqueInput {
+  id: ID
+}
+
+input TargetingProcessingStepWhereInput {
+  AND: [TargetingProcessingStepWhereInput!]
+  OR: [TargetingProcessingStepWhereInput!]
+  NOT: [TargetingProcessingStepWhereInput!]
+  id: IDFilter
+  audience: AudienceWhereInput
+  sort: IntNullableFilter
+  outputType: TargetingProcessingStepOutputTypeTypeNullableFilter
+  customCoding: StringFilter
+}
+
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
+}
+
+input TargetingProcessingStepOutputTypeTypeNullableFilter {
+  equals: TargetingProcessingStepOutputTypeType
+  in: [TargetingProcessingStepOutputTypeType!]
+  notIn: [TargetingProcessingStepOutputTypeType!]
+  not: TargetingProcessingStepOutputTypeTypeNullableFilter
+}
+
+input TargetingProcessingStepOrderByInput {
+  id: OrderDirection
+  sort: OrderDirection
+  outputType: OrderDirection
+  customCoding: OrderDirection
+}
+
+input TargetingProcessingStepUpdateInput {
+  audience: AudienceRelateToOneForUpdateInput
+  sort: Int
+  outputType: TargetingProcessingStepOutputTypeType
+  customCoding: String
+}
+
+input AudienceRelateToOneForUpdateInput {
+  create: AudienceCreateInput
+  connect: AudienceWhereUniqueInput
+  disconnect: Boolean
+}
+
+input TargetingProcessingStepUpdateArgs {
+  where: TargetingProcessingStepWhereUniqueInput!
+  data: TargetingProcessingStepUpdateInput!
+}
+
+input TargetingProcessingStepCreateInput {
+  audience: AudienceRelateToOneForCreateInput
+  sort: Int
+  outputType: TargetingProcessingStepOutputTypeType
+  customCoding: String
+}
+
+input AudienceRelateToOneForCreateInput {
+  create: AudienceCreateInput
+  connect: AudienceWhereUniqueInput
+}
+
+type Audience {
+  id: ID!
+  advertiser: Advertiser
+  status: Boolean
+  tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
+  rebuild: Int
+  rebuildUnit: AudienceRebuildUnitType
+  TTL_Length: Int
+  TTL_Unit: AudienceTTLUnitType
+  dataSource: TargetingDataSource
+  dataFilter: String
+  processes(where: TargetingProcessingStepWhereInput! = {}, orderBy: [TargetingProcessingStepOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TargetingProcessingStepWhereUniqueInput): [TargetingProcessingStep!]
+  processesCount(where: TargetingProcessingStepWhereInput! = {}): Int
+  meta: String
+  oneView: String
+  xandr: String
+}
+
+enum AudienceRebuildUnitType {
+  days
+  weeks
+  months
+}
+
+enum AudienceTTLUnitType {
+  days
+  weeks
+  months
+}
+
+input AudienceWhereUniqueInput {
+  id: ID
+}
+
+input AudienceWhereInput {
+  AND: [AudienceWhereInput!]
+  OR: [AudienceWhereInput!]
+  NOT: [AudienceWhereInput!]
+  id: IDFilter
+  advertiser: AdvertiserWhereInput
+  status: BooleanFilter
+  rebuild: IntNullableFilter
+  rebuildUnit: AudienceRebuildUnitTypeNullableFilter
+  TTL_Length: IntNullableFilter
+  TTL_Unit: AudienceTTLUnitTypeNullableFilter
+  dataSource: TargetingDataSourceWhereInput
+  dataFilter: StringNullableFilter
+  processes: TargetingProcessingStepManyRelationFilter
+  meta: StringNullableFilter
+  oneView: StringNullableFilter
+  xandr: StringNullableFilter
+}
+
+input BooleanFilter {
+  equals: Boolean
+  not: BooleanFilter
+}
+
+input AudienceRebuildUnitTypeNullableFilter {
+  equals: AudienceRebuildUnitType
+  in: [AudienceRebuildUnitType!]
+  notIn: [AudienceRebuildUnitType!]
+  not: AudienceRebuildUnitTypeNullableFilter
+}
+
+input AudienceTTLUnitTypeNullableFilter {
+  equals: AudienceTTLUnitType
+  in: [AudienceTTLUnitType!]
+  notIn: [AudienceTTLUnitType!]
+  not: AudienceTTLUnitTypeNullableFilter
+}
+
+input TargetingProcessingStepManyRelationFilter {
+  every: TargetingProcessingStepWhereInput
+  some: TargetingProcessingStepWhereInput
+  none: TargetingProcessingStepWhereInput
+}
+
+input AudienceOrderByInput {
+  id: OrderDirection
+  status: OrderDirection
+  rebuild: OrderDirection
+  rebuildUnit: OrderDirection
+  TTL_Length: OrderDirection
+  TTL_Unit: OrderDirection
+  dataFilter: OrderDirection
+  meta: OrderDirection
+  oneView: OrderDirection
+  xandr: OrderDirection
+}
+
+input AudienceUpdateInput {
+  advertiser: AdvertiserRelateToOneForUpdateInput
+  status: Boolean
+  tags: JSON
+  rebuild: Int
+  rebuildUnit: AudienceRebuildUnitType
+  TTL_Length: Int
+  TTL_Unit: AudienceTTLUnitType
+  dataSource: TargetingDataSourceRelateToOneForUpdateInput
+  dataFilter: String
+  processes: TargetingProcessingStepRelateToManyForUpdateInput
+  meta: String
+  oneView: String
+  xandr: String
+}
+
+input AdvertiserRelateToOneForUpdateInput {
+  create: AdvertiserCreateInput
+  connect: AdvertiserWhereUniqueInput
+  disconnect: Boolean
+}
+
+input TargetingDataSourceRelateToOneForUpdateInput {
+  create: TargetingDataSourceCreateInput
+  connect: TargetingDataSourceWhereUniqueInput
+  disconnect: Boolean
+}
+
+input TargetingProcessingStepRelateToManyForUpdateInput {
+  disconnect: [TargetingProcessingStepWhereUniqueInput!]
+  set: [TargetingProcessingStepWhereUniqueInput!]
+  create: [TargetingProcessingStepCreateInput!]
+  connect: [TargetingProcessingStepWhereUniqueInput!]
+}
+
+input AudienceUpdateArgs {
+  where: AudienceWhereUniqueInput!
+  data: AudienceUpdateInput!
+}
+
+input AudienceCreateInput {
+  advertiser: AdvertiserRelateToOneForCreateInput
+  status: Boolean
+  tags: JSON
+  rebuild: Int
+  rebuildUnit: AudienceRebuildUnitType
+  TTL_Length: Int
+  TTL_Unit: AudienceTTLUnitType
+  dataSource: TargetingDataSourceRelateToOneForCreateInput
+  dataFilter: String
+  processes: TargetingProcessingStepRelateToManyForCreateInput
+  meta: String
+  oneView: String
+  xandr: String
+}
+
+input AdvertiserRelateToOneForCreateInput {
+  create: AdvertiserCreateInput
+  connect: AdvertiserWhereUniqueInput
+}
+
+input TargetingDataSourceRelateToOneForCreateInput {
+  create: TargetingDataSourceCreateInput
+  connect: TargetingDataSourceWhereUniqueInput
+}
+
+input TargetingProcessingStepRelateToManyForCreateInput {
+  create: [TargetingProcessingStepCreateInput!]
+  connect: [TargetingProcessingStepWhereUniqueInput!]
+}
+
+type AudienceTag {
+  id: ID!
+  audience: Audience
+  tag: Tag
+  order: Int
+}
+
+input AudienceTagWhereUniqueInput {
+  id: ID
+}
+
+input AudienceTagWhereInput {
+  AND: [AudienceTagWhereInput!]
+  OR: [AudienceTagWhereInput!]
+  NOT: [AudienceTagWhereInput!]
+  id: IDFilter
+  audience: AudienceWhereInput
+  tag: TagWhereInput
+  order: IntFilter
+}
+
+input IntFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntFilter
+}
+
+input AudienceTagOrderByInput {
+  id: OrderDirection
+  order: OrderDirection
+}
+
+input AudienceTagUpdateInput {
+  audience: AudienceRelateToOneForUpdateInput
+  tag: TagRelateToOneForUpdateInput
+  order: Int
+}
+
+input TagRelateToOneForUpdateInput {
+  create: TagCreateInput
+  connect: TagWhereUniqueInput
+  disconnect: Boolean
+}
+
+input AudienceTagUpdateArgs {
+  where: AudienceTagWhereUniqueInput!
+  data: AudienceTagUpdateInput!
+}
+
+input AudienceTagCreateInput {
+  audience: AudienceRelateToOneForCreateInput
+  tag: TagRelateToOneForCreateInput
+  order: Int
+}
+
+input TagRelateToOneForCreateInput {
+  create: TagCreateInput
+  connect: TagWhereUniqueInput
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -353,12 +822,48 @@ type Mutation {
   updateTenants(data: [TenantUpdateArgs!]!): [Tenant]
   deleteTenant(where: TenantWhereUniqueInput!): Tenant
   deleteTenants(where: [TenantWhereUniqueInput!]!): [Tenant]
+  createTag(data: TagCreateInput!): Tag
+  createTags(data: [TagCreateInput!]!): [Tag]
+  updateTag(where: TagWhereUniqueInput!, data: TagUpdateInput!): Tag
+  updateTags(data: [TagUpdateArgs!]!): [Tag]
+  deleteTag(where: TagWhereUniqueInput!): Tag
+  deleteTags(where: [TagWhereUniqueInput!]!): [Tag]
   createAdvertiser(data: AdvertiserCreateInput!): Advertiser
   createAdvertisers(data: [AdvertiserCreateInput!]!): [Advertiser]
   updateAdvertiser(where: AdvertiserWhereUniqueInput!, data: AdvertiserUpdateInput!): Advertiser
   updateAdvertisers(data: [AdvertiserUpdateArgs!]!): [Advertiser]
   deleteAdvertiser(where: AdvertiserWhereUniqueInput!): Advertiser
   deleteAdvertisers(where: [AdvertiserWhereUniqueInput!]!): [Advertiser]
+  createTargetingDataSource(data: TargetingDataSourceCreateInput!): TargetingDataSource
+  createTargetingDataSources(data: [TargetingDataSourceCreateInput!]!): [TargetingDataSource]
+  updateTargetingDataSource(where: TargetingDataSourceWhereUniqueInput!, data: TargetingDataSourceUpdateInput!): TargetingDataSource
+  updateTargetingDataSources(data: [TargetingDataSourceUpdateArgs!]!): [TargetingDataSource]
+  deleteTargetingDataSource(where: TargetingDataSourceWhereUniqueInput!): TargetingDataSource
+  deleteTargetingDataSources(where: [TargetingDataSourceWhereUniqueInput!]!): [TargetingDataSource]
+  createTargetingGeoFrame(data: TargetingGeoFrameCreateInput!): TargetingGeoFrame
+  createTargetingGeoFrames(data: [TargetingGeoFrameCreateInput!]!): [TargetingGeoFrame]
+  updateTargetingGeoFrame(where: TargetingGeoFrameWhereUniqueInput!, data: TargetingGeoFrameUpdateInput!): TargetingGeoFrame
+  updateTargetingGeoFrames(data: [TargetingGeoFrameUpdateArgs!]!): [TargetingGeoFrame]
+  deleteTargetingGeoFrame(where: TargetingGeoFrameWhereUniqueInput!): TargetingGeoFrame
+  deleteTargetingGeoFrames(where: [TargetingGeoFrameWhereUniqueInput!]!): [TargetingGeoFrame]
+  createTargetingProcessingStep(data: TargetingProcessingStepCreateInput!): TargetingProcessingStep
+  createTargetingProcessingSteps(data: [TargetingProcessingStepCreateInput!]!): [TargetingProcessingStep]
+  updateTargetingProcessingStep(where: TargetingProcessingStepWhereUniqueInput!, data: TargetingProcessingStepUpdateInput!): TargetingProcessingStep
+  updateTargetingProcessingSteps(data: [TargetingProcessingStepUpdateArgs!]!): [TargetingProcessingStep]
+  deleteTargetingProcessingStep(where: TargetingProcessingStepWhereUniqueInput!): TargetingProcessingStep
+  deleteTargetingProcessingSteps(where: [TargetingProcessingStepWhereUniqueInput!]!): [TargetingProcessingStep]
+  createAudience(data: AudienceCreateInput!): Audience
+  createAudiences(data: [AudienceCreateInput!]!): [Audience]
+  updateAudience(where: AudienceWhereUniqueInput!, data: AudienceUpdateInput!): Audience
+  updateAudiences(data: [AudienceUpdateArgs!]!): [Audience]
+  deleteAudience(where: AudienceWhereUniqueInput!): Audience
+  deleteAudiences(where: [AudienceWhereUniqueInput!]!): [Audience]
+  createAudienceTag(data: AudienceTagCreateInput!): AudienceTag
+  createAudienceTags(data: [AudienceTagCreateInput!]!): [AudienceTag]
+  updateAudienceTag(where: AudienceTagWhereUniqueInput!, data: AudienceTagUpdateInput!): AudienceTag
+  updateAudienceTags(data: [AudienceTagUpdateArgs!]!): [AudienceTag]
+  deleteAudienceTag(where: AudienceTagWhereUniqueInput!): AudienceTag
+  deleteAudienceTags(where: [AudienceTagWhereUniqueInput!]!): [AudienceTag]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -391,9 +896,27 @@ type Query {
   tenants(where: TenantWhereInput! = {}, orderBy: [TenantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TenantWhereUniqueInput): [Tenant!]
   tenant(where: TenantWhereUniqueInput!): Tenant
   tenantsCount(where: TenantWhereInput! = {}): Int
+  tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
+  tag(where: TagWhereUniqueInput!): Tag
+  tagsCount(where: TagWhereInput! = {}): Int
   advertisers(where: AdvertiserWhereInput! = {}, orderBy: [AdvertiserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AdvertiserWhereUniqueInput): [Advertiser!]
   advertiser(where: AdvertiserWhereUniqueInput!): Advertiser
   advertisersCount(where: AdvertiserWhereInput! = {}): Int
+  targetingDataSources(where: TargetingDataSourceWhereInput! = {}, orderBy: [TargetingDataSourceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TargetingDataSourceWhereUniqueInput): [TargetingDataSource!]
+  targetingDataSource(where: TargetingDataSourceWhereUniqueInput!): TargetingDataSource
+  targetingDataSourcesCount(where: TargetingDataSourceWhereInput! = {}): Int
+  targetingGeoFrames(where: TargetingGeoFrameWhereInput! = {}, orderBy: [TargetingGeoFrameOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TargetingGeoFrameWhereUniqueInput): [TargetingGeoFrame!]
+  targetingGeoFrame(where: TargetingGeoFrameWhereUniqueInput!): TargetingGeoFrame
+  targetingGeoFramesCount(where: TargetingGeoFrameWhereInput! = {}): Int
+  targetingProcessingSteps(where: TargetingProcessingStepWhereInput! = {}, orderBy: [TargetingProcessingStepOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TargetingProcessingStepWhereUniqueInput): [TargetingProcessingStep!]
+  targetingProcessingStep(where: TargetingProcessingStepWhereUniqueInput!): TargetingProcessingStep
+  targetingProcessingStepsCount(where: TargetingProcessingStepWhereInput! = {}): Int
+  audiences(where: AudienceWhereInput! = {}, orderBy: [AudienceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AudienceWhereUniqueInput): [Audience!]
+  audience(where: AudienceWhereUniqueInput!): Audience
+  audiencesCount(where: AudienceWhereInput! = {}): Int
+  audienceTags(where: AudienceTagWhereInput! = {}, orderBy: [AudienceTagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AudienceTagWhereUniqueInput): [AudienceTag!]
+  audienceTag(where: AudienceTagWhereUniqueInput!): AudienceTag
+  audienceTagsCount(where: AudienceTagWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }
