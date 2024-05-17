@@ -8,7 +8,7 @@ import { Advertiser } from "./models/advertising/Advertiser"
 import { TargetingDataSource } from "./models/advertising/targeting/DataSource"
 import { TargetingGeoFrame } from "./models/advertising/targeting/GeoFrame"
 import { TargetingProcessingStep } from "./models/advertising/targeting/ProcessingStep"
-import { Audience, AudienceTag } from "./models/advertising/Audience"
+import { Audience, AudienceTag, AudienceProcess } from "./models/advertising/Audience"
 
 export default {
   User,
@@ -20,5 +20,6 @@ export default {
   TargetingGeoFrame,
   TargetingProcessingStep,
   Audience,
-  AudienceTag
+  AudienceTag,
+  AudienceProcess,
 }

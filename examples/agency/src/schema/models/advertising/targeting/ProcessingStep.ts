@@ -53,17 +53,6 @@ export const TargetingProcessingStep = list({
     },
   } as Partial<ListAccessControl<BaseListTypeInfo>>),
   fields: {
-    audience: relationship({
-      ref: "Audience.processes",
-      many: false,
-      ui: {
-        displayMode: "cards",
-        cardFields: ["advertiser"],
-        inlineConnect: false,
-        hideCreate: true,
-      },
-    }),
-    sort: integer({ ui: { createView: { fieldMode: "hidden" } } }),
     outputType: select(DataType),
     customCoding: text({
       ui: {

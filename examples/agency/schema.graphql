@@ -494,8 +494,6 @@ input TargetingGeoFrameCreateInput {
 
 type TargetingProcessingStep {
   id: ID!
-  audience: Audience
-  sort: Int
   outputType: TargetingProcessingStepOutputTypeType
   customCoding: String
 }
@@ -515,21 +513,8 @@ input TargetingProcessingStepWhereInput {
   OR: [TargetingProcessingStepWhereInput!]
   NOT: [TargetingProcessingStepWhereInput!]
   id: IDFilter
-  audience: AudienceWhereInput
-  sort: IntNullableFilter
   outputType: TargetingProcessingStepOutputTypeTypeNullableFilter
   customCoding: StringFilter
-}
-
-input IntNullableFilter {
-  equals: Int
-  in: [Int!]
-  notIn: [Int!]
-  lt: Int
-  lte: Int
-  gt: Int
-  gte: Int
-  not: IntNullableFilter
 }
 
 input TargetingProcessingStepOutputTypeTypeNullableFilter {
@@ -541,22 +526,13 @@ input TargetingProcessingStepOutputTypeTypeNullableFilter {
 
 input TargetingProcessingStepOrderByInput {
   id: OrderDirection
-  sort: OrderDirection
   outputType: OrderDirection
   customCoding: OrderDirection
 }
 
 input TargetingProcessingStepUpdateInput {
-  audience: AudienceRelateToOneForUpdateInput
-  sort: Int
   outputType: TargetingProcessingStepOutputTypeType
   customCoding: String
-}
-
-input AudienceRelateToOneForUpdateInput {
-  create: AudienceCreateInput
-  connect: AudienceWhereUniqueInput
-  disconnect: Boolean
 }
 
 input TargetingProcessingStepUpdateArgs {
@@ -565,15 +541,8 @@ input TargetingProcessingStepUpdateArgs {
 }
 
 input TargetingProcessingStepCreateInput {
-  audience: AudienceRelateToOneForCreateInput
-  sort: Int
   outputType: TargetingProcessingStepOutputTypeType
   customCoding: String
-}
-
-input AudienceRelateToOneForCreateInput {
-  create: AudienceCreateInput
-  connect: AudienceWhereUniqueInput
 }
 
 type Audience {
@@ -588,7 +557,6 @@ type Audience {
   dataSource: TargetingDataSource
   dataFilter: String
   processes(where: TargetingProcessingStepWhereInput! = {}, orderBy: [TargetingProcessingStepOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TargetingProcessingStepWhereUniqueInput): [TargetingProcessingStep!]
-  processesCount(where: TargetingProcessingStepWhereInput! = {}): Int
   meta: String
   oneView: String
   xandr: String
@@ -623,7 +591,6 @@ input AudienceWhereInput {
   TTL_Unit: AudienceTTLUnitTypeNullableFilter
   dataSource: TargetingDataSourceWhereInput
   dataFilter: StringNullableFilter
-  processes: TargetingProcessingStepManyRelationFilter
   meta: StringNullableFilter
   oneView: StringNullableFilter
   xandr: StringNullableFilter
@@ -632,6 +599,17 @@ input AudienceWhereInput {
 input BooleanFilter {
   equals: Boolean
   not: BooleanFilter
+}
+
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
 }
 
 input AudienceRebuildUnitTypeNullableFilter {
@@ -646,12 +624,6 @@ input AudienceTTLUnitTypeNullableFilter {
   in: [AudienceTTLUnitType!]
   notIn: [AudienceTTLUnitType!]
   not: AudienceTTLUnitTypeNullableFilter
-}
-
-input TargetingProcessingStepManyRelationFilter {
-  every: TargetingProcessingStepWhereInput
-  some: TargetingProcessingStepWhereInput
-  none: TargetingProcessingStepWhereInput
 }
 
 input AudienceOrderByInput {
@@ -677,7 +649,7 @@ input AudienceUpdateInput {
   TTL_Unit: AudienceTTLUnitType
   dataSource: TargetingDataSourceRelateToOneForUpdateInput
   dataFilter: String
-  processes: TargetingProcessingStepRelateToManyForUpdateInput
+  processes: JSON
   meta: String
   oneView: String
   xandr: String
@@ -695,13 +667,6 @@ input TargetingDataSourceRelateToOneForUpdateInput {
   disconnect: Boolean
 }
 
-input TargetingProcessingStepRelateToManyForUpdateInput {
-  disconnect: [TargetingProcessingStepWhereUniqueInput!]
-  set: [TargetingProcessingStepWhereUniqueInput!]
-  create: [TargetingProcessingStepCreateInput!]
-  connect: [TargetingProcessingStepWhereUniqueInput!]
-}
-
 input AudienceUpdateArgs {
   where: AudienceWhereUniqueInput!
   data: AudienceUpdateInput!
@@ -717,7 +682,7 @@ input AudienceCreateInput {
   TTL_Unit: AudienceTTLUnitType
   dataSource: TargetingDataSourceRelateToOneForCreateInput
   dataFilter: String
-  processes: TargetingProcessingStepRelateToManyForCreateInput
+  processes: JSON
   meta: String
   oneView: String
   xandr: String
@@ -731,11 +696,6 @@ input AdvertiserRelateToOneForCreateInput {
 input TargetingDataSourceRelateToOneForCreateInput {
   create: TargetingDataSourceCreateInput
   connect: TargetingDataSourceWhereUniqueInput
-}
-
-input TargetingProcessingStepRelateToManyForCreateInput {
-  create: [TargetingProcessingStepCreateInput!]
-  connect: [TargetingProcessingStepWhereUniqueInput!]
 }
 
 type AudienceTag {
@@ -781,6 +741,12 @@ input AudienceTagUpdateInput {
   order: Int
 }
 
+input AudienceRelateToOneForUpdateInput {
+  create: AudienceCreateInput
+  connect: AudienceWhereUniqueInput
+  disconnect: Boolean
+}
+
 input TagRelateToOneForUpdateInput {
   create: TagCreateInput
   connect: TagWhereUniqueInput
@@ -798,9 +764,68 @@ input AudienceTagCreateInput {
   order: Int
 }
 
+input AudienceRelateToOneForCreateInput {
+  create: AudienceCreateInput
+  connect: AudienceWhereUniqueInput
+}
+
 input TagRelateToOneForCreateInput {
   create: TagCreateInput
   connect: TagWhereUniqueInput
+}
+
+type AudienceProcess {
+  id: ID!
+  audience: Audience
+  process: TargetingProcessingStep
+  order: Int
+}
+
+input AudienceProcessWhereUniqueInput {
+  id: ID
+}
+
+input AudienceProcessWhereInput {
+  AND: [AudienceProcessWhereInput!]
+  OR: [AudienceProcessWhereInput!]
+  NOT: [AudienceProcessWhereInput!]
+  id: IDFilter
+  audience: AudienceWhereInput
+  process: TargetingProcessingStepWhereInput
+  order: IntFilter
+}
+
+input AudienceProcessOrderByInput {
+  id: OrderDirection
+  order: OrderDirection
+}
+
+input AudienceProcessUpdateInput {
+  audience: AudienceRelateToOneForUpdateInput
+  process: TargetingProcessingStepRelateToOneForUpdateInput
+  order: Int
+}
+
+input TargetingProcessingStepRelateToOneForUpdateInput {
+  create: TargetingProcessingStepCreateInput
+  connect: TargetingProcessingStepWhereUniqueInput
+  disconnect: Boolean
+}
+
+input AudienceProcessUpdateArgs {
+  where: AudienceProcessWhereUniqueInput!
+  data: AudienceProcessUpdateInput!
+}
+
+input AudienceProcessCreateInput {
+  audience: AudienceRelateToOneForCreateInput
+  process: TargetingProcessingStepRelateToOneForCreateInput
+  order: Int
+}
+
+input TargetingProcessingStepRelateToOneForCreateInput {
+  create: TargetingProcessingStepCreateInput
+  connect: TargetingProcessingStepWhereUniqueInput
 }
 
 """
@@ -869,6 +894,12 @@ type Mutation {
   updateAudienceTags(data: [AudienceTagUpdateArgs!]!): [AudienceTag]
   deleteAudienceTag(where: AudienceTagWhereUniqueInput!): AudienceTag
   deleteAudienceTags(where: [AudienceTagWhereUniqueInput!]!): [AudienceTag]
+  createAudienceProcess(data: AudienceProcessCreateInput!): AudienceProcess
+  createAudienceProcesses(data: [AudienceProcessCreateInput!]!): [AudienceProcess]
+  updateAudienceProcess(where: AudienceProcessWhereUniqueInput!, data: AudienceProcessUpdateInput!): AudienceProcess
+  updateAudienceProcesses(data: [AudienceProcessUpdateArgs!]!): [AudienceProcess]
+  deleteAudienceProcess(where: AudienceProcessWhereUniqueInput!): AudienceProcess
+  deleteAudienceProcesses(where: [AudienceProcessWhereUniqueInput!]!): [AudienceProcess]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -922,6 +953,9 @@ type Query {
   audienceTags(where: AudienceTagWhereInput! = {}, orderBy: [AudienceTagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AudienceTagWhereUniqueInput): [AudienceTag!]
   audienceTag(where: AudienceTagWhereUniqueInput!): AudienceTag
   audienceTagsCount(where: AudienceTagWhereInput! = {}): Int
+  audienceProcesses(where: AudienceProcessWhereInput! = {}, orderBy: [AudienceProcessOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AudienceProcessWhereUniqueInput): [AudienceProcess!]
+  audienceProcess(where: AudienceProcessWhereUniqueInput!): AudienceProcess
+  audienceProcessesCount(where: AudienceProcessWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

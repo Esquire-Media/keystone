@@ -82,33 +82,29 @@ model TargetingGeoFrame {
 }
 
 model TargetingProcessingStep {
-  id           String    @id @default(cuid())
-  audience     Audience? @relation("TargetingProcessingStep_audience", fields: [audienceId], references: [id])
-  audienceId   String?   @map("audience")
-  sort         Int?
-  outputType   String?
-  customCoding String    @default("")
-
-  @@index([audienceId])
+  id                           String            @id @default(cuid())
+  outputType                   String?
+  customCoding                 String            @default("")
+  from_AudienceProcess_process AudienceProcess[] @relation("AudienceProcess_process")
 }
 
 model Audience {
-  id                        String                    @id @default(cuid())
-  advertiser                Advertiser?               @relation("Audience_advertiser", fields: [advertiserId], references: [id])
-  advertiserId              String?                   @map("advertiser")
-  status                    Boolean                   @default(true)
-  rebuild                   Int?                      @default(1)
-  rebuildUnit               String?                   @default("months")
-  TTL_Length                Int?                      @default(1)
-  TTL_Unit                  String?                   @default("months")
-  dataSource                TargetingDataSource?      @relation("Audience_dataSource", fields: [dataSourceId], references: [id])
-  dataSourceId              String?                   @map("dataSource")
-  dataFilter                String?
-  processes                 TargetingProcessingStep[] @relation("TargetingProcessingStep_audience")
-  meta                      String?
-  oneView                   String?
-  xandr                     String?
-  from_AudienceTag_audience AudienceTag[]             @relation("AudienceTag_audience")
+  id                            String               @id @default(cuid())
+  advertiser                    Advertiser?          @relation("Audience_advertiser", fields: [advertiserId], references: [id])
+  advertiserId                  String?              @map("advertiser")
+  status                        Boolean              @default(true)
+  rebuild                       Int?                 @default(1)
+  rebuildUnit                   String?              @default("months")
+  TTL_Length                    Int?                 @default(1)
+  TTL_Unit                      String?              @default("months")
+  dataSource                    TargetingDataSource? @relation("Audience_dataSource", fields: [dataSourceId], references: [id])
+  dataSourceId                  String?              @map("dataSource")
+  dataFilter                    String?
+  meta                          String?
+  oneView                       String?
+  xandr                         String?
+  from_AudienceTag_audience     AudienceTag[]        @relation("AudienceTag_audience")
+  from_AudienceProcess_audience AudienceProcess[]    @relation("AudienceProcess_audience")
 
   @@index([advertiserId])
   @@index([dataSourceId])
@@ -126,4 +122,18 @@ model AudienceTag {
   @@unique([audienceId, order])
   @@index([audienceId])
   @@index([tagId])
+}
+
+model AudienceProcess {
+  id         String                   @id @default(cuid())
+  audience   Audience?                @relation("AudienceProcess_audience", fields: [audienceId], references: [id])
+  audienceId String?                  @map("audience")
+  process    TargetingProcessingStep? @relation("AudienceProcess_process", fields: [processId], references: [id])
+  processId  String?                  @map("process")
+  order      Int                      @default(0)
+
+  @@unique([audienceId, processId])
+  @@unique([audienceId, order])
+  @@index([audienceId])
+  @@index([processId])
 }

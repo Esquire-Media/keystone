@@ -189,12 +189,43 @@ export const Audience = list({
             style: "antd",
           },
         }),
-        processes: relationship({
-          ref: "TargetingProcessingStep.audience",
-          many: true,
+        processes: virtual({
+          field: (lists) => {
+            return graphql.field({
+              args: lists.TargetingProcessingStep.types.findManyArgs,
+              type: graphql.list(graphql.nonNull(lists.TargetingProcessingStep.types.output)),
+              async resolve(item, args, context) {
+                return (
+                  await context.query.AudienceProcess.findMany({
+                    where: { audience: { id: { equals: item.id } }, process: args.where },
+                    orderBy: { order: 'asc' },
+                    query: `process { ${Object.keys(context.__internal.lists.TargetingProcessingStep.fields).join(' ')} }`,
+                  })
+                ).map((x) => ({ ...x.process }));
+              },
+            });
+          },
           ui: {
-            displayMode: "cards",
-            cardFields: ["outputType"],
+            views: './src/fields/virtual/views/processing_steps', // Path to views file for custom field UI
+            query: '{ id }',
+          },
+          hooks: {
+            // Hook to handle the explicit relationship between Post and Tag via AudienceTag records
+            afterOperation: async ({ context, inputData, item }) => {
+              if (inputData?.tags && Array.isArray(inputData.tags)) {
+                // Clear all related AudienceProcess records to prevent unique constraint collisions
+                await context.prisma.audienceProcess.deleteMany({
+                  where: { audienceId: { equals: item.id } },
+                });
+                // Create new AudienceTags records to handle the explicit relationship
+                const audienceProcesses = inputData.processes.map((t, order) => ({
+                  audience: { connect: { id: item.id } },
+                  process: { connect: { id: t.id.toString() } },
+                  order,
+                }));
+                await context.query.AudienceProcess.createMany({ data: audienceProcesses });
+              }
+            },
           },
         }),
       },
@@ -237,6 +268,25 @@ export const AudienceTag = list({
     extendPrismaSchema(schema) {
       // Add unique constraints to prevent duplicate tag relations
       return schema.replace(/(model [^}]+)}/g, '$1@@unique([audienceId, tagId])\n@@unique([audienceId, order])\n}')
+    },
+  },
+})
+
+// Intermediate explicit join model for the Audience and Tag models
+export const AudienceProcess = list({
+  access: allowLoggedIn(),
+  fields: {
+    audience: relationship({ ref: 'Audience' }),
+    process: relationship({ ref: 'TargetingProcessingStep' }),
+    order: integer({ defaultValue: 0, validation: { isRequired: true } }),
+  },
+  ui: {
+    isHidden: true
+  },
+  db: {
+    extendPrismaSchema(schema) {
+      // Add unique constraints to prevent duplicate tag relations
+      return schema.replace(/(model [^}]+)}/g, '$1@@unique([audienceId, processId])\n@@unique([audienceId, order])\n}')
     },
   },
 })
