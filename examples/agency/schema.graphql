@@ -260,6 +260,75 @@ input TenantRelateToManyForCreateInput {
   connect: [TenantWhereUniqueInput!]
 }
 
+type Advertiser {
+  id: ID!
+  title: String
+  tenant: Tenant
+  meta: String
+  oneView: String
+  xandr: String
+}
+
+input AdvertiserWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input AdvertiserWhereInput {
+  AND: [AdvertiserWhereInput!]
+  OR: [AdvertiserWhereInput!]
+  NOT: [AdvertiserWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  tenant: TenantWhereInput
+  meta: StringNullableFilter
+  oneView: StringNullableFilter
+  xandr: StringNullableFilter
+}
+
+input StringNullableFilter {
+  equals: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  not: StringNullableFilter
+}
+
+input AdvertiserOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  meta: OrderDirection
+  oneView: OrderDirection
+  xandr: OrderDirection
+}
+
+input AdvertiserUpdateInput {
+  title: String
+  tenant: TenantRelateToOneForUpdateInput
+  meta: String
+  oneView: String
+  xandr: String
+}
+
+input AdvertiserUpdateArgs {
+  where: AdvertiserWhereUniqueInput!
+  data: AdvertiserUpdateInput!
+}
+
+input AdvertiserCreateInput {
+  title: String
+  tenant: TenantRelateToOneForCreateInput
+  meta: String
+  oneView: String
+  xandr: String
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -284,6 +353,12 @@ type Mutation {
   updateTenants(data: [TenantUpdateArgs!]!): [Tenant]
   deleteTenant(where: TenantWhereUniqueInput!): Tenant
   deleteTenants(where: [TenantWhereUniqueInput!]!): [Tenant]
+  createAdvertiser(data: AdvertiserCreateInput!): Advertiser
+  createAdvertisers(data: [AdvertiserCreateInput!]!): [Advertiser]
+  updateAdvertiser(where: AdvertiserWhereUniqueInput!, data: AdvertiserUpdateInput!): Advertiser
+  updateAdvertisers(data: [AdvertiserUpdateArgs!]!): [Advertiser]
+  deleteAdvertiser(where: AdvertiserWhereUniqueInput!): Advertiser
+  deleteAdvertisers(where: [AdvertiserWhereUniqueInput!]!): [Advertiser]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -316,6 +391,9 @@ type Query {
   tenants(where: TenantWhereInput! = {}, orderBy: [TenantOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TenantWhereUniqueInput): [Tenant!]
   tenant(where: TenantWhereUniqueInput!): Tenant
   tenantsCount(where: TenantWhereInput! = {}): Int
+  advertisers(where: AdvertiserWhereInput! = {}, orderBy: [AdvertiserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AdvertiserWhereUniqueInput): [Advertiser!]
+  advertiser(where: AdvertiserWhereUniqueInput!): Advertiser
+  advertisersCount(where: AdvertiserWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }
