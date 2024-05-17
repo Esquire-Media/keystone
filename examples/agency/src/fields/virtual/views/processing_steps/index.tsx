@@ -58,12 +58,6 @@ function ComponentWrapper(props: {
   const foreignList = useList(props.foreignListKey)
 
   /* Handlers */
-  // Adds items only if they do not already share a label
-  const addItem = (item: Item) => {
-    if (value.filter((v) => v.label === item.label).length === 0) {
-      onChange([...value, item])
-    }
-  }
   // Handles both the item state and the onChange
   const onChange = (items: Item[]) => {
     props.onChange(items.map(i => ({ [props.foreignLabelPath]: i.label, id: i.value })))
@@ -98,7 +92,7 @@ function ComponentWrapper(props: {
             }}
             onCreate={val => {
               setIsDrawerOpen(false)
-              addItem(value)
+              onChange([...value, { label: val.label, value: val.id }])
             }}
           />
         </DrawerController>

@@ -212,15 +212,15 @@ export const Audience = list({
           hooks: {
             // Hook to handle the explicit relationship between Post and Tag via AudienceTag records
             afterOperation: async ({ context, inputData, item }) => {
-              if (inputData?.tags && Array.isArray(inputData.tags)) {
+              if (inputData?.processes && Array.isArray(inputData.processes)) {
                 // Clear all related AudienceProcess records to prevent unique constraint collisions
                 await context.prisma.audienceProcess.deleteMany({
                   where: { audienceId: { equals: item.id } },
                 });
                 // Create new AudienceTags records to handle the explicit relationship
-                const audienceProcesses = inputData.processes.map((t, order) => ({
+                const audienceProcesses = inputData.processes.map((p, order) => ({
                   audience: { connect: { id: item.id } },
-                  process: { connect: { id: t.id.toString() } },
+                  process: { connect: { id: p.id.toString() } },
                   order,
                 }));
                 await context.query.AudienceProcess.createMany({ data: audienceProcesses });
