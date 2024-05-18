@@ -207,7 +207,7 @@ export const Audience = list({
           },
           ui: {
             views: './src/fields/virtual/views/processing_steps', // Path to views file for custom field UI
-            query: '{ id }',
+            query: '{ id outputType }',
           },
           hooks: {
             // Hook to handle the explicit relationship between Post and Tag via AudienceTag records

@@ -629,6 +629,9 @@ importers:
       '@keystone-ui/icons':
         specifier: workspace:^
         version: link:../../design-system/packages/icons
+      '@keystone-ui/loading':
+        specifier: workspace:^
+        version: link:../../design-system/packages/loading
       '@keystone-ui/modals':
         specifier: workspace:^
         version: link:../../design-system/packages/modals
