@@ -73,6 +73,7 @@ export const Audience = list({
       many: false,
       ui: {
         itemView: { fieldMode: "read" },
+        hideCreate: true,
       },
     }),
     status: checkbox({ defaultValue: true }),
@@ -101,10 +102,10 @@ export const Audience = list({
         afterOperation: async ({ context, inputData, item }) => {
           if (inputData?.tags && Array.isArray(inputData.tags)) {
             const tagTitles = inputData.tags.filter((t) => !t.id).map((t) => t.title);
-            const foundTags = await context.query.Tag.findMany({
+            const foundTags = tagTitles ? await context.query.Tag.findMany({
               where: { title: { in: tagTitles } },
               query: 'id title',
-            });
+            }) : [];
             // Update tags with found IDs
             inputData.tags.filter((t) => !t.id).forEach((t) => {
               t.id = foundTags.find((c) => c.title === t.title)?.id;

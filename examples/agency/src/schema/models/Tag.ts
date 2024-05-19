@@ -1,5 +1,5 @@
 import { list } from '@keystone-6/core';
-import { allowLoggedIn } from '../utils';
+import { allowLoggedIn, isGlobalAdmin } from '../utils';
 import { text } from '@keystone-6/core/fields';
 
 export const Tag = list({
@@ -17,4 +17,7 @@ export const Tag = list({
       }
     },
   },
+  ui: {
+    isHidden: ({context}) => !isGlobalAdmin(context)
+  }
 })

@@ -7,6 +7,9 @@ import merge from 'lodash.merge';
 export const TargetingGeoFrame = list({
   access: merge(allowLoggedIn(), {
     operation: {
+      query: ({ context }) => {
+        return Boolean(context.session)
+      },
       create: ({ context }) => {
         return isGlobalAdmin(context); // Allow access to global admins.
       },
@@ -17,12 +20,6 @@ export const TargetingGeoFrame = list({
         return isGlobalAdmin(context); // Allow access to global admins.
       },
     },
-    filter: {
-      query: ({ context }) => {
-        if (!context.session) return false
-        return {}
-      },
-    }
   } as Partial<ListAccessControl<BaseListTypeInfo>>),
   fields: {
     ESQID: text(),

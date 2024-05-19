@@ -59,10 +59,11 @@ export const User = list({
           // Resolve function to retrieve tenants and their descendants associated with the user.
           resolve: async (item, args, context) => {
             // Retrieve and return the tenants and their descendants, filtered by the combined tenant and descendant IDs.
+            const ids = await getUserTenantIds(context, item.id.toString())
             return context.db.Tenant.findMany({
               where: {
                 AND: [
-                  { id: { in: await getUserTenantIds(context, context.session.itemId) } }, // Include both tenants and descendants.
+                  { id: { in: ids } }, // Include both tenants and descendants.
                   args.where, // Apply additional criteria from the query arguments.
                 ],
               },
@@ -75,4 +76,8 @@ export const User = list({
       },
     })
   },
+  ui:{
+    hideCreate: ({context}) => !isGlobalAdmin(context),
+    hideDelete: ({context}) => !isGlobalAdmin(context),
+  }
 });

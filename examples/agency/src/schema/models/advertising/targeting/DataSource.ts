@@ -21,7 +21,7 @@ export const TargetingDataSource = list({
     filter: {
       query: ({ context }) => {
         if (isGlobalAdmin(context)) return {}; // Allow access to global admins.
-        return { where: { title: { in: ["Custom GeoFrames"] } } }
+        return { title: { in: ["Custom GeoFrames"] } }
       },
     }
   } as Partial<ListAccessControl<BaseListTypeInfo>>),

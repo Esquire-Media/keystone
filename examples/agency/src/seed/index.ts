@@ -6,6 +6,7 @@ import seedTags from './tags';
 import seedPermissions from './permissions';
 import seedAdvertisers from './advertisers';
 import seedTargetingDataSources from './targetdatasources';
+import seedAudiences from './audiences';
 
 
 /**
@@ -25,6 +26,7 @@ export default async function seedDatabase(context: KeystoneContext) {
   await seedPermissions(context);
   await seedAdvertisers(context);
   await seedTargetingDataSources(context);
+  await seedAudiences(context);
 
   console.log(`🌱 Database seeding process completed.`);
 }
