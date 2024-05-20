@@ -20,6 +20,7 @@
     "@keystone-ui/icons": "workspace:^",
     "@keystone-ui/loading": "workspace:^",
     "@keystone-ui/modals": "workspace:^",
+    "@keystone-ui/toast": "workspace:^",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@monaco-editor/react": "^4.6.0",

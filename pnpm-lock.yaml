@@ -635,6 +635,9 @@ importers:
       '@keystone-ui/modals':
         specifier: workspace:^
         version: link:../../design-system/packages/modals
+      '@keystone-ui/toast':
+        specifier: workspace:^
+        version: link:../../design-system/packages/toast
       '@mapbox/mapbox-gl-draw':
         specifier: ^1.4.3
         version: 1.4.3
