@@ -10,7 +10,7 @@ import { useKeystone, useList } from '@keystone-6/core/admin-ui/context'
 import { Fields, deserializeValue, makeDataGetter } from '@keystone-6/core/admin-ui/utils'
 import { GraphQLErrorNotice } from '@keystone-6/core/admin-ui/components'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 type ValueWithoutServerSideErrors = { [key: string]: { kind: 'value', value: any } }
 
