@@ -99,18 +99,18 @@ function ComponentWrapper(props: {
           />
         </DrawerController>
       )}
-      {props.onChange !== undefined && value.map((item) => (
-        <DrawerController isOpen={Boolean(isEditDrawerOpen)} key={item.value || ""}>
+      {props.onChange !== undefined && (
+        <DrawerController isOpen={Boolean(isEditDrawerOpen)} key={isEditDrawerOpen || ""}>
           <ItemDrawer
             listKey={props.foreignListKey}
-            id={item.value || ""}
+            id={isEditDrawerOpen || ""}
             onClose={() => {
               setIsEditDrawerOpen(undefined)
             }}
             onSave={console.log}
           />
         </DrawerController>
-      ))}
+      )}
     </div>
   )
 }

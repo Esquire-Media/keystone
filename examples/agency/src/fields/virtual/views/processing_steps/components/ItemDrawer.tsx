@@ -10,7 +10,7 @@ import { useKeystone, useList } from '@keystone-6/core/admin-ui/context'
 import { Fields, deserializeValue, makeDataGetter } from '@keystone-6/core/admin-ui/utils'
 import { GraphQLErrorNotice } from '@keystone-6/core/admin-ui/components'
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo'
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 type ValueWithoutServerSideErrors = { [key: string]: { kind: 'value', value: any } }
 
@@ -35,7 +35,6 @@ export function ItemDrawer({
     }`,
     { variables: { id }, errorPolicy: 'all', skip: id === null }
   )
-  const dataGetter = makeDataGetter(itemState.data, itemState.error?.graphQLErrors)
   const [value, setValue] = useState(() => {
     const value: ValueWithoutServerSideErrors = {}
     Object.keys(list.fields).forEach(fieldPath => {
@@ -45,20 +44,21 @@ export function ItemDrawer({
   })
   useEffect(() => {
     if (!itemState.loading && !itemState.error && itemState.data && itemState.data.item) {
-      const value: ValueWithoutServerSideErrors = {}
-      const fieldValues = deserializeValue(list.fields,dataGetter)
-      Object.keys(list.fields).forEach(fieldPath => {
-        value[fieldPath] = { kind: 'value', value: fieldValues[fieldPath] }
+      const val: ValueWithoutServerSideErrors = {}
+      // itemState.data has one field called "item", use this and not just the "data"
+      const dataGetter = makeDataGetter(itemState.data.item, undefined)
+      const fieldValues = deserializeValue(list.fields, dataGetter)
+      // fieldValues is already formatted properly, no need to add { kind: 'value', ... }
+      Object.entries(fieldValues).forEach(([fv, fp]) => {
+        fp.kind === "value" ? val[fv] = fp : undefined
       })
-      console.log(fieldValues)
-      // setValue(value)
+      setValue(val)
     }
   }, [itemState])
   const invalidFields = useMemo(() => {
     const invalidFields = new Set<string>()
-
     Object.keys(value).forEach(fieldPath => {
-      const val = value[fieldPath].value
+      let val = value[fieldPath].value
 
       const validateFn = list.fields[fieldPath].controller.validate
       if (validateFn) {
