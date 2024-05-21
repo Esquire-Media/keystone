@@ -1,18 +1,18 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
+import { Fragment, useState } from 'react';
 import { Button } from '@keystone-ui/button'
 import { Stack, jsx } from '@keystone-ui/core';
+import { FieldContainer, FieldDescription, FieldLabel } from '@keystone-ui/fields';
 import { DrawerController } from '@keystone-ui/modals'
 import { FieldProps } from '@keystone-6/core/types';
-import { FieldContainer, FieldDescription, FieldLabel } from '@keystone-ui/fields';
 import { controller } from '@keystone-6/core/fields/types/virtual/views';
-import { OrderableList, type Item } from '../../../../primatives'
-import { Fragment, useState } from 'react';
 import { useList } from '@keystone-6/core/admin-ui/context';
 import { CreateItemDrawer } from '@keystone-6/core/admin-ui/components';
-import { ItemDrawer } from './components/ItemDrawer';
 import { gql, useQuery } from '@keystone-6/core/admin-ui/apollo';
+import { ItemDrawer } from './components/ItemDrawer';
+import { OrderableList, type Item } from '../../../../primatives'
 
 export const Field = (props: FieldProps<typeof controller>) => {
   // Get metadata properties using a custom hook
@@ -52,10 +52,17 @@ function ComponentWrapper(props: {
   value: any[];
   onChange: (values: any) => void;
 }) {
+  /* Consts/States */
   const foreignList = useList(props.foreignListKey)
+  // @ts-ignore - "options" DOES exist on fieldMeta
   const labels = foreignList.fields[props.foreignLabelPath].fieldMeta["options"]
-  const value: Item[] = props.value.map((v) => ({ label: labels.find((option: any) => option.value === v[props.foreignLabelPath]).label, value: v.id }))
-  const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false)
+  const value: Item[] = props.value.map((v) => ({
+    label: labels.find((option: any) =>
+      option.value === v[props.foreignLabelPath]
+    ).label,
+    value: v.id
+  }))
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState<boolean>(false)
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState<string | undefined>()
 
   // After onCreate, this gets the object needed for display in "OrderableList"
@@ -72,20 +79,31 @@ function ComponentWrapper(props: {
       variables: {}
     }
   )
+
+  /* Handlers */
   const onCreate = async (item: Item) => {
     const res = await newForeignItemQuery.refetch({
       where: {
         id: item.value
       }
     })
-    props.onChange([...props.value, res.data[foreignList.gqlNames.itemQueryName]])
+    props.onChange([
+      ...props.value,
+      res.data[foreignList.gqlNames.itemQueryName]
+    ])
   }
 
   // Item[] is used for display purposes
   // This converts it to the correct type for the Field's onChange
   const onChange = (items: Item[]) => {
-    props.onChange(items.map(i => ({ [props.foreignLabelPath]: labels.find((option: any) => option.label === i.label).value, id: i.value })))
+    props.onChange(items.map(i => ({
+      [props.foreignLabelPath]: labels.find((option: any) =>
+        option.label === i.label
+      ).value,
+      id: i.value
+    })))
   }
+
   const onClick = (item: Item) => {
     setIsEditDrawerOpen(item.value)
   }
@@ -93,11 +111,10 @@ function ComponentWrapper(props: {
   return (
     <div>
       <OrderableList
-        items={value.map(i => ({ ...i, key: i.value }))}
+        items={value.map(i => ({ ...i, key: i.value as string }))}
         onChange={onChange}
         onClick={onClick}
       />
-
       <Stack across gap="small">
         {props.onChange !== undefined && (
           <Button
@@ -126,7 +143,10 @@ function ComponentWrapper(props: {
         </DrawerController>
       )}
       {props.onChange !== undefined && (
-        <DrawerController isOpen={Boolean(isEditDrawerOpen)} key={isEditDrawerOpen || ""}>
+        <DrawerController
+          isOpen={Boolean(isEditDrawerOpen)}
+          key={isEditDrawerOpen || ""}
+        >
           <ItemDrawer
             listKey={props.foreignListKey}
             id={isEditDrawerOpen || ""}
