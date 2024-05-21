@@ -60,16 +60,19 @@ export function ItemDrawer({
     return invalidFields
   }, [list, value])
 
-  // Acquire and format the updated Field values
-  const updateData: Record<string, any> = {}
-  Object.keys(list.fields).forEach(fieldPath => {
-    const { controller } = list.fields[fieldPath]
-    const serialized = controller.serialize(value[fieldPath].value)
-    // Checking to see if a change has actually occurred
-    if (!isDeepEqual(serialized, controller.serialize(controller.defaultValue))) {
-      Object.assign(updateData, serialized)
-    }
-  })
+  // Takes originalItem from "itemState", checks for changes, returns updateData for mutation
+  const getUpdateData = (originalItem: Record<string, any>) => {
+    const updateData: Record<string, any> = {}
+    Object.keys(list.fields).forEach(fieldPath => {
+      const { controller } = list.fields[fieldPath]
+      const serialized = controller.serialize(value[fieldPath].value)
+      // Checking to see if a change has actually occurred
+      if (!isDeepEqual(serialized, originalItem[fieldPath])) {
+        Object.assign(updateData, serialized)
+      }
+    })
+    return updateData
+  }
 
   /* Queries */
   // Query to get all the current values of the item
@@ -81,6 +84,7 @@ export function ItemDrawer({
     }`,
     { variables: { id }, errorPolicy: 'all', skip: id === null }
   )
+
   // Handles "itemState" query result, formats and sets "value" state
   useEffect(() => {
     if (!itemState.loading && !itemState.error && itemState.data?.item) {
@@ -114,7 +118,7 @@ export function ItemDrawer({
         where: {
           id: id
         },
-        data: updateData
+        data: getUpdateData(itemState.data.item)
       }
     }
   )
