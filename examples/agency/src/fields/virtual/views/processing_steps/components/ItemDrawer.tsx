@@ -112,15 +112,7 @@ export function ItemDrawer({
             ${Object.keys(list.fields)}
           }
         }
-    `,
-    {
-      variables: {
-        where: {
-          id: id
-        },
-        data: getUpdateData(itemState.data.item)
-      }
-    }
+    `
   )
 
   /* Handlers */
@@ -144,7 +136,16 @@ export function ItemDrawer({
     // Call update
     let outputData;
     try {
-      outputData = await updateItem()
+      outputData = await updateItem(
+        {
+          variables: {
+            where: {
+              id: id
+            },
+            data: getUpdateData(itemState.data.item)
+          }
+        }
+      )
     } catch {
       return undefined
     }
