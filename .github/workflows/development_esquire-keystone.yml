@@ -34,8 +34,7 @@ jobs:
 
       - name: Package artifact for deployment
         run: |
-          cd examples/agency
-          tar -czf ../../release.tar.gz ./*
+          tar -czf release.tar.gz ./*
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
