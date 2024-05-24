@@ -21,20 +21,23 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      - name: pnpm install at root
+        run: pnpm install
+
+      - name: Package artifact for deployment
+        run: |
+          cd examples/agency
+          pnpm build
+          pnpm pack ../..
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: release.zip
+          path: keystone-6-example-agency-0.0.1.tgz
 
   deploy:
     runs-on: ubuntu-latest
@@ -50,9 +53,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: node-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
+          
+      - name: Unpack artifact for deployment
+        run: tar -xzf keystone-6-example-agency-0.0.1.tgz
       
       - name: Login to Azure
         uses: azure/login@v1
@@ -67,5 +70,5 @@ jobs:
         with:
           app-name: 'esquire-keystone'
           slot-name: 'Production'
-          package: .
+          package: './package'
           
