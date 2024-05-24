@@ -63,6 +63,9 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_156E8E3B4418405C994B7764D42218EB }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FBD17284F91D41618AAB167C0E885AC5 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_063149B324D64D21931F8196D6F93E33 }}
+          
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
