@@ -7,7 +7,8 @@
     "dev": "keystone dev",
     "start": "keystone start",
     "build": "keystone build",
-    "postinstall": "keystone postinstall"
+    "postinstall": "keystone postinstall",
+    "generate": "keystone --no-ui build"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^16.6.0",
