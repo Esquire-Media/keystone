@@ -10,7 +10,7 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { Item, OrderableItem } from '..';
-import { Trash2Icon } from "../../../../../design-system/packages/icons/src";
+import { Trash2Icon } from "@keystone-ui/icons";
 
 type Props = {
   items: OrderableItem[];
