@@ -1,7 +1,6 @@
 import { config } from '@keystone-6/core'
 import { statelessSessions } from '@keystone-6/core/session'
 import { createAuth } from '@keystone-6/auth'
-import { fixPrismaPath } from '../example-utils'
 import lists from './src/schema'
 import { Session } from './src/schema/types'
 import { type TypeInfo } from '.keystone/types'
@@ -54,9 +53,9 @@ export default withAuth<TypeInfo<Session>>(
       provider: process.env.DATABASE_PROVIDER as DatabaseProvider || 'sqlite',
       url: process.env.DATABASE_URL || 'file:./keystone-example.db',
       onConnect: seedData,
-
-      // WARNING: this is only needed for our monorepo examples, dont do this
-      ...fixPrismaPath,
+    },
+    server: {
+      port: 8080
     },
     lists,
     // you can find out more at https://keystonejs.com/docs/apis/session#session-api
