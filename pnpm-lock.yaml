@@ -2389,8 +2389,8 @@ importers:
         specifier: ^0.100.0
         version: 0.100.0(slate@0.103.0)
       slate-react:
-        specifier: ^0.102.0
-        version: 0.102.0(react-dom@18.3.1)(react@18.3.1)(slate@0.103.0)
+        specifier: ^0.104.0
+        version: 0.104.0(react-dom@18.3.1)(react@18.3.1)(slate@0.103.0)
     devDependencies:
       '@keystone-6/core':
         specifier: workspace:^
@@ -21301,8 +21301,8 @@ packages:
       slate: 0.103.0
     dev: true
 
-  /slate-react@0.102.0(react-dom@18.3.1)(react@18.3.1)(slate@0.103.0):
-    resolution: {integrity: sha512-SAcFsK5qaOxXjm0hr/t2pvIxfRv6HJGzmWkG58TdH4LdJCsgKS1n6hQOakHPlRVCwPgwvngB6R+t3pPjv8MqwA==}
+  /slate-react@0.104.0(react-dom@18.3.1)(react@18.3.1)(slate@0.103.0):
+    resolution: {integrity: sha512-Uz7bJW2KYgfyp8SOdgm0EmeocUlGXq5y0o2NbWTaW151LWYyGbi2C4Qr4kWq2Rrpj0oQGPMjID3d4AKsxUJpxg==}
     peerDependencies:
       react: '>=18.2.0'
       react-dom: '>=18.2.0'
