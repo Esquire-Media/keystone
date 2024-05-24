@@ -24,11 +24,24 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
+      - name: pnpm install at root
+        run: pnpm install
+
+      - name: pnpm build in examples/agency directory
+        run: |
+          cd examples/agency
+          pnpm run build --if-present
+
+      - name: Package artifact for deployment
+        run: |
+          cd examples/agency
+          tar -czf ../../release.tar.gz ./*
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: release.zip
+          path: release.tar.gz
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,8 +58,8 @@ jobs:
         with:
           name: node-app
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
+      - name: Unpack artifact for deployment
+        run: tar -xzf release.tar.gz
 
       - name: Login to Azure
         uses: azure/login@v1
