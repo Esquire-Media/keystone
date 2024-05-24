@@ -31,7 +31,7 @@ jobs:
         run: |
           cd examples/agency
           pnpm build
-          pnpm pack ../..
+          pnpm pack
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
