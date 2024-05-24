@@ -21,23 +21,20 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: pnpm install at root
-        run: pnpm install
-
-      - name: Package artifact for deployment
+      - name: npm install, build, and test
         run: |
-          cd examples/agency
-          pnpm build
-          pnpm pack ../..
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: keystone-6-example-agency-0.0.1.tgz
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,7 +43,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # This is required for requesting the JWT
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -54,15 +51,15 @@ jobs:
         with:
           name: node-app
 
-      - name: Unpack artifact for deployment
-        run: tar -xzf keystone-6-example-agency-0.0.1.tgz
-
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F42F90A2C87D4DAA8EC00069B9729633 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6874E04072224CFDA79FA928D285C787 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_665AB6CA5BA64BF2AA956237B2FE5170 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_156E8E3B4418405C994B7764D42218EB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FBD17284F91D41618AAB167C0E885AC5 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_063149B324D64D21931F8196D6F93E33 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -70,4 +67,5 @@ jobs:
         with:
           app-name: 'esquire-keystone'
           slot-name: 'Production'
-          package: './package'
+          package: .
+          
