@@ -24,19 +24,6 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: pnpm install at root
-        run: pnpm install
-
-      - name: pnpm build in examples/agency directory
-        run: |
-          cd examples/agency
-          pnpm run build --if-present
-
-      - name: Zip artifact for deployment
-        run: |
-          cd examples/agency
-          zip -r ../../release.zip ./*
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
@@ -74,4 +61,4 @@ jobs:
         with:
           app-name: 'esquire-keystone'
           slot-name: 'Production'
-          package: './examples/agency'
+          package: '.'
