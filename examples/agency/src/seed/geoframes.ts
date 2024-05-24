@@ -1,5 +1,4 @@
 import { KeystoneContext } from "@keystone-6/core/types";
-import geojson from "./common/geoframes.json";
 
 type GeoFrame = {
   ESQID: string,
@@ -20,31 +19,34 @@ type GeoFrame = {
 export default async function seedGeoFrames(context: KeystoneContext) {
   try {
     console.log(`🌍 Seeding GeoFrames...`);
+    try {
+      const geojson = await import("./common/geoframes.json")
 
-    const GeoFrames = (geojson as GeoFrame[]).map((record) => ({
-      ...record,
-      polygon: {
-        type: "FeatureCollection",
-        features: [JSON.parse(record.polygon)],
-      },
-    }));
+      const GeoFrames = (geojson as GeoFrame[]).map((record) => ({
+        ...record,
+        polygon: {
+          type: "FeatureCollection",
+          features: [JSON.parse(record.polygon)],
+        },
+      }));
 
-    // Use the sudo context to bypass access control
-    const { db, query } = context.sudo();
+      // Use the sudo context to bypass access control
+      const { db, query } = context.sudo();
 
-    // Find GeoFrames already in the database by their ESQID
-    const alreadyInDatabase = await db.TargetingGeoFrame.findMany({
-      where: { ESQID: { in: GeoFrames.map((x) => x.ESQID) } },
-    });
+      // Find GeoFrames already in the database by their ESQID
+      const alreadyInDatabase = await db.TargetingGeoFrame.findMany({
+        where: { ESQID: { in: GeoFrames.map((x) => x.ESQID) } },
+      });
 
-    // Determine which GeoFrames need to be created by filtering out already existing ones
-    const toCreate = GeoFrames.filter(
-      (seed) => !alreadyInDatabase.some((x) => x.ESQID === seed.ESQID)
-    );
+      // Determine which GeoFrames need to be created by filtering out already existing ones
+      const toCreate = GeoFrames.filter(
+        (seed) => !alreadyInDatabase.some((x) => x.ESQID === seed.ESQID)
+      );
 
-    await query.TargetingGeoFrame.createMany({
-      data: toCreate
-    });
+      await query.TargetingGeoFrame.createMany({
+        data: toCreate
+      });
+    } catch { }
 
     console.log(`🌍 Seeding GeoFrames completed.`);
   } catch (error) {
