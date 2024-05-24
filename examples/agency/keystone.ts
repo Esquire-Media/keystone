@@ -7,6 +7,7 @@ import { Session } from './src/schema/types'
 import { type TypeInfo } from '.keystone/types'
 import * as dotenv from "dotenv";
 import seedData from './src/seed'
+import { DatabaseProvider } from '@keystone-6/core/types'
 
 dotenv.config()
 
@@ -50,7 +51,7 @@ const { withAuth } = createAuth({
 export default withAuth<TypeInfo<Session>>(
   config<TypeInfo>({
     db: {
-      provider: 'sqlite',
+      provider: process.env.DATABASE_PROVIDER as DatabaseProvider || 'sqlite',
       url: process.env.DATABASE_URL || 'file:./keystone-example.db',
       onConnect: seedData,
 

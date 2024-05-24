@@ -13,22 +13,27 @@ export default async function seedAudiences(context: KeystoneContext) {
     console.log(`👥 Seeding audiences...`);
 
     // Use the sudo context to bypass access control
-    const { db } = context.sudo();
+    const { db, query } = context.sudo();
 
-    // Find audiences already in the database by their name
-    const alreadyInDatabase = await db.Audience.findMany();
+    const alreadyInDatabase = await query.Audience.findMany({ query: "tags { title }"});
 
-    // Helper function to serialize tags arrays
-    function serializeTags(tags) {
-      console.log(tags)
-      return tags?.map(tag => tag.title).sort().join(',');
+    // Function to check if two audiences have the same tags in the same order
+    function areTagsEqual(tags1: { title: string }[], tags2: { title: string }[]): boolean {
+      if (tags1.length !== tags2.length) {
+        return false;
+      }
+    
+      for (let i = 0; i < tags1.length; i++) {
+        if (tags1[i].title !== tags2[i].title) {
+          return false;
+        }
+      }
+      return true;
     }
 
     // Determine which audiences need to be created by filtering out already existing ones
     const toCreate = Audiences.filter(
-      (audience) => !alreadyInDatabase.some(
-        (x) => serializeTags(x.tags) === serializeTags(audience.tags)
-      )
+      (audience) => !alreadyInDatabase.some(x => areTagsEqual(audience.tags, x.tags))
     );
 
     const data = await Promise.all(toCreate.map(async (audience) => {

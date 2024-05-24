@@ -7,6 +7,7 @@ import seedPermissions from './permissions';
 import seedAdvertisers from './advertisers';
 import seedTargetingDataSources from './targetdatasources';
 import seedAudiences from './audiences';
+import seedGeoFrames from './geoframes';
 
 
 /**
@@ -27,6 +28,7 @@ export default async function seedDatabase(context: KeystoneContext) {
   await seedAdvertisers(context);
   await seedTargetingDataSources(context);
   await seedAudiences(context);
+  await seedGeoFrames(context);
 
   console.log(`🌱 Database seeding process completed.`);
 }

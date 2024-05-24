@@ -10,3 +10,5 @@ __generated__
 # system
 .DS_Store
 *.vscode
+examples/agency/src/seed/common/geoframes.json
+examples/agency/.env
