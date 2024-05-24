@@ -27,20 +27,17 @@ jobs:
       - name: pnpm install at root
         run: pnpm install
 
-      - name: pnpm build in examples/agency directory
-        run: |
-          cd examples/agency
-          pnpm run build --if-present
-
       - name: Package artifact for deployment
         run: |
-          tar -czf release.tar.gz ./*
+          cd examples/agency
+          pnpm build
+          pnpm pack ../..
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: release.tar.gz
+          path: keystone-6-example-agency-0.0.1.tgz
 
   deploy:
     runs-on: ubuntu-latest
@@ -58,7 +55,7 @@ jobs:
           name: node-app
 
       - name: Unpack artifact for deployment
-        run: tar -xzf release.tar.gz
+        run: tar -xzf keystone-6-example-agency-0.0.1.tgz
 
       - name: Login to Azure
         uses: azure/login@v1
@@ -73,4 +70,4 @@ jobs:
         with:
           app-name: 'esquire-keystone'
           slot-name: 'Production'
-          package: '.'
+          package: './package'
