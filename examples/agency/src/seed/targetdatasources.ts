@@ -52,7 +52,7 @@ const DataSources = [
         label: "ID",
         type: "text",
       },
-      esqid: {
+      ESQID: {
         label: "ESQ ID (Legacy)",
         type: "text",
       },
