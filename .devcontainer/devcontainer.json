@@ -5,14 +5,10 @@
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "image": "mcr.microsoft.com/devcontainers/typescript-node",
 
-  // Features to add to the dev container. More info: https://containers.dev/features.
-  // "features": {},
+  // Use 'postCreateCommand' to ensure latest pnpm version.
+  "postCreateCommand": "npm i -g npm pnpm",
 
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // "forwardPorts": [],
-
-  // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "pnpm install",
+  "postStartCommand": "pnpm i",
 
   // Configure tool-specific properties.
   "customizations": {
