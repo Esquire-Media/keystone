@@ -1,5 +1,5 @@
 import merge from "lodash.merge";
-import ListInputConfig from "./widgets/ListInput";
+import ListInputConfig from "../../widgets/ListInput";
 import { BasicFuncs } from "@react-awesome-query-builder/ui";
 
 const Config = merge(ListInputConfig, {

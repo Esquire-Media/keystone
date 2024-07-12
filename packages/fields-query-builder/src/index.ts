@@ -12,6 +12,7 @@ import { getNamedType } from "graphql";
 import merge from "lodash.merge";
 import { BasicConfig, type Config, Utils } from "@react-awesome-query-builder/ui";
 import { AntdConfig } from "@react-awesome-query-builder/antd";
+import BaseConfig from "./widgets/ListInput"
 
 export const JSONLogicFormats = graphql.enum({
   name: "JSONLogicFormat",
@@ -47,6 +48,7 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
   switch (config.ui?.style) {
     case "antd": defaultConfig = AntdConfig
   }
+  defaultConfig = merge(defaultConfig, BaseConfig)
   return (meta) =>
     fieldType({
       kind: "scalar",
@@ -76,7 +78,7 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
         orderBy: { arg: graphql.arg({ type: orderDirectionEnum }) },
       },
       output: graphql.field({
-        type: graphql.String,
+        type: graphql.JSON,
         args: {
           format: graphql.arg({
             type: JSONLogicFormats,
@@ -84,6 +86,7 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
           }),
         },
         resolve: async (source, args, context, info) => {
+          const value = JSON.parse(source.value ?? "")
           if (args?.format) {
             let fields: {} = typeof config.fields === "object" ? { ...config.fields } : {}
             if (config.dependency) {
@@ -102,24 +105,24 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
               ...defaultConfig,
               fields: fields
             }
-            const jsonLogic = Utils.loadFromJsonLogic(JSON.parse(source.value ?? ""), mergedConfig);
+            const jsonLogic = Utils.loadFromJsonLogic(value, mergedConfig);
             if (jsonLogic) {
               switch (args.format) {
                 case "mongodb":
-                  return JSON.stringify(Utils.Export.mongodbFormat(jsonLogic, mergedConfig));
+                  return Utils.Export.mongodbFormat(jsonLogic, mergedConfig);
                 case "sql":
-                  return JSON.stringify(Utils.Export.sqlFormat(jsonLogic, mergedConfig));
+                  return Utils.Export.sqlFormat(jsonLogic, mergedConfig);
                 case "spel":
-                  return JSON.stringify(Utils.Export.spelFormat(jsonLogic, mergedConfig));
+                  return Utils.Export.spelFormat(jsonLogic, mergedConfig);
                 case "elasticsearch":
-                  return JSON.stringify(Utils.Export.elasticSearchFormat(jsonLogic, mergedConfig));
+                  return Utils.Export.elasticSearchFormat(jsonLogic, mergedConfig);
                 // Add more cases for custom formats as needed
                 default:
-                  return source.value;
+                  return value;
               }
             }
           } else {
-            return source.value
+            return value
           }
         },
       }),
