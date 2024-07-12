@@ -5,13 +5,18 @@ import {
   type CommonFieldConfig,
   orderDirectionEnum,
   JSONValue,
-} from '@keystone-6/core/types';
-import { graphql } from '@keystone-6/core';
-import { filters } from '@keystone-6/core/fields';
+} from "@keystone-6/core/types";
+import { graphql } from "@keystone-6/core";
+import { filters } from "@keystone-6/core/fields";
 import { getNamedType } from "graphql";
 import merge from "lodash.merge";
-import { BasicConfig, type Config, Utils } from '@react-awesome-query-builder/ui';
+import { BasicConfig, type Config, Utils } from "@react-awesome-query-builder/ui";
 import { AntdConfig } from "@react-awesome-query-builder/antd";
+
+export const JSONLogicFormats = graphql.enum({
+  name: "JSONLogicFormat",
+  values: graphql.enumValues(["json", "mongodb", "sql", "spel", "elasticsearch"]),
+})
 
 export type FilterDepenancy = {
   list?: string; // The specific list the dependency is part of.
@@ -40,7 +45,7 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
   const mode = isIndexed === "unique" ? "required" : "optional";
   let defaultConfig: Config = BasicConfig
   switch (config.ui?.style) {
-    case 'antd': defaultConfig = AntdConfig
+    case "antd": defaultConfig = AntdConfig
   }
   return (meta) =>
     fieldType({
@@ -74,8 +79,8 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
         type: graphql.String,
         args: {
           format: graphql.arg({
-            type: graphql.String,
-            defaultValue: 'json',
+            type: JSONLogicFormats,
+            defaultValue: "json",
           }),
         },
         resolve: async (source, args, context, info) => {
@@ -90,7 +95,7 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
                   query: createNestedString(keys)
                 })))
               } else if (config.dependency.list) {
-                
+
               }
             }
             const mergedConfig: Config = {
@@ -100,13 +105,13 @@ export function queryBuilder<ListTypeInfo extends BaseListTypeInfo>({
             const jsonLogic = Utils.loadFromJsonLogic(JSON.parse(source.value ?? ""), mergedConfig);
             if (jsonLogic) {
               switch (args.format) {
-                case 'mongodb':
+                case "mongodb":
                   return JSON.stringify(Utils.Export.mongodbFormat(jsonLogic, mergedConfig));
-                case 'sql':
+                case "sql":
                   return JSON.stringify(Utils.Export.sqlFormat(jsonLogic, mergedConfig));
-                case 'spel':
+                case "spel":
                   return JSON.stringify(Utils.Export.spelFormat(jsonLogic, mergedConfig));
-                case 'elasticsearch':
+                case "elasticsearch":
                   return JSON.stringify(Utils.Export.elasticSearchFormat(jsonLogic, mergedConfig));
                 // Add more cases for custom formats as needed
                 default:
