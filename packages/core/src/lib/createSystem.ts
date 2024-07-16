@@ -12,15 +12,14 @@ import { resolveDefaults } from './defaults'
 import { createAdminMeta } from './create-admin-meta'
 import { createGraphQLSchema } from './createGraphQLSchema'
 import { createContext } from './context/createContext'
-import { initialiseLists, type InitialisedList } from './core/initialise-lists'
+import {
+  type InitialisedList,
+  initialiseLists,
+} from './core/initialise-lists'
 
 // TODO: this cannot be changed for now, circular dependency with getSystemPaths, getEsbuildConfig
 export function getBuiltKeystoneConfigurationPath (cwd: string) {
   return path.join(cwd, '.keystone/config.js')
-}
-
-export function getBuiltKeystoneConfiguration (cwd: string) {
-  return require(getBuiltKeystoneConfigurationPath(cwd)).default
 }
 
 function posixify (s: string) {
@@ -158,7 +157,7 @@ function injectNewDefaults (prismaClient: unknown, lists: Record<string, Initial
         } catch (e: any) {
           console.error(e)
 
-          if ((e as any).code === undefined) {
+          if (e.code === undefined) {
             return new GraphQLError(`Prisma error`, {
               extensions: {
                 code: 'KS_PRISMA_ERROR',
@@ -170,7 +169,7 @@ function injectNewDefaults (prismaClient: unknown, lists: Record<string, Initial
           }
 
           // TODO: remove e.message unless debug
-          return new GraphQLError(`Prisma error: ${e.message.split('\n').slice(-1)[0].trim()}`, {
+          return new GraphQLError(`Prisma error: ${e.message.split('\n').pop()?.trim()}`, {
             extensions: {
               code: 'KS_PRISMA_ERROR',
               prisma: { ...e },
