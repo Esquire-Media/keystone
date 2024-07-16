@@ -29,7 +29,7 @@ export function Field(props: ViewProps) {
 
   const wrappedProps: ComponentProps = {
     ...props,
-    value: JSON.parse(props.value || "null"),
+    value: props.value,
     fields: fields,
     setFields,
   };
@@ -93,7 +93,7 @@ export const controller = (
     defaultValue: null,
     deserialize: (data) => {
       const value = data[config.path];
-      return typeof value === "string" ? value : null;
+      return typeof value === "string" ? JSON.parse(value) : value;
     },
     serialize: (value) => ({ [config.path]: value }),
   };
