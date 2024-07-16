@@ -4,7 +4,15 @@
 type Report {
   id: ID!
   title: String
-  query: String
+  query(format: JSONLogicFormat = json): JSON
+}
+
+enum JSONLogicFormat {
+  json
+  mongodb
+  sql
+  spel
+  elasticsearch
 }
 
 input ReportWhereUniqueInput {

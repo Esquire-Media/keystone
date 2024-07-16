@@ -555,7 +555,7 @@ type Audience {
   TTL_Length: Int
   TTL_Unit: AudienceTTLUnitType
   dataSource: TargetingDataSource
-  dataFilter: String
+  dataFilter(format: JSONLogicFormat = json): JSON
   processes(where: TargetingProcessingStepWhereInput! = {}, orderBy: [TargetingProcessingStepOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TargetingProcessingStepWhereUniqueInput): [TargetingProcessingStep!]
   meta: String
   oneView: String
@@ -572,6 +572,14 @@ enum AudienceTTLUnitType {
   days
   weeks
   months
+}
+
+enum JSONLogicFormat {
+  json
+  mongodb
+  sql
+  spel
+  elasticsearch
 }
 
 input AudienceWhereUniqueInput {

@@ -33,15 +33,19 @@ export const User = list({
       isFilterable: true, // Allow the email field to be filterable in queries.
       isOrderable: true, // Allow the email field to be sorted in list views.
       hooks: {
-        validateInput: ({ resolvedData, addValidationError, item }) => {
-          // If the resolved data does not contain a new email but the existing record does, skip validation.
-          if (!resolvedData.email && item?.email) return;
+        validate: ({ resolvedData, addValidationError, item }) => {
+          if (resolvedData){
+            // If the resolved data does not contain a new email but the existing record does, skip validation.
+            if (!resolvedData.email && item?.email) return;
 
-          // Regular expression pattern to validate email format.
-          const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-          if (!emailRegex.test(resolvedData.email)) {
-            // Add a validation error if the email format is invalid.
-            addValidationError('Invalid email format');
+            // Regular expression pattern to validate email format.
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(resolvedData.email)) {
+              // Add a validation error if the email format is invalid.
+              addValidationError('Invalid email format');
+            }
+          } else {
+            addValidationError('Email required');
           }
         },
       },
