@@ -12,8 +12,6 @@
   "dependencies": {
     "@hello-pangea/dnd": "^16.6.0",
     "@keystone-6/core": "workspace:^",
-    "@keystone-ui/core": "workspace:^",
-    "@keystone-ui/fields": "workspace:^",
     "@prisma/client": "catalog:"
   },
   "devDependencies": {
