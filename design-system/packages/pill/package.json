@@ -12,13 +12,13 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "react": "catalog:"
+    "react": "^18.2.0"
   },
   "devDependencies": {
-    "react": "catalog:"
+    "react": "^18.2.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.24.7",
+    "@babel/runtime": "^7.16.3",
     "@keystone-ui/core": "workspace:^",
     "@keystone-ui/icons": "workspace:^"
   },

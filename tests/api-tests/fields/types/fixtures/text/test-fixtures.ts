@@ -4,7 +4,6 @@ export const name = 'Text'
 export const typeFunction = text
 export const exampleValue = () => 'foo'
 export const exampleValue2 = () => 'bar'
-export const nonNullableDefault = true
 export const supportsNullInput = false
 export const supportsUnique = true
 export const supportsGraphQLIsNonNull = true

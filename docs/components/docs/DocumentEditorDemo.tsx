@@ -7,7 +7,6 @@ import {
   type InferRenderersForComponentBlocks,
   fields,
 } from '@keystone-6/fields-document/component-blocks'
-import { type document } from '@keystone-6/fields-document'
 import { Global, jsx } from '@emotion/react'
 
 import { getInitialPropsValue } from '../../../packages/fields-document/src/DocumentEditor/component-blocks/initial-values'
@@ -91,7 +90,7 @@ const componentBlocks = {
   carousel: componentBlocksInSandboxProject.carousel,
 }
 
-type DocumentFieldConfig = Parameters<typeof document>[0]
+type DocumentFieldConfig = Parameters<typeof import('@keystone-6/fields-document').document>[0]
 
 function documentFeaturesCodeExample (config: DocumentFieldConfig | DocumentFeatures) {
   return `import { config, list } from '@keystone-6/core';
@@ -275,7 +274,7 @@ export function DocumentFeaturesFormAndCode () {
   )
 }
 
-export function DocumentEditorDemo () {
+export const DocumentEditorDemo = () => {
   const [value, setValue] = useState(initialContent as any)
   const [key, setKey] = useState(0)
   const { documentFeatures, formValue } = useContext(DocumentFeaturesContext)
@@ -293,6 +292,7 @@ export function DocumentEditorDemo () {
     // slate looks like it's a controlled component but it actually isn't
     // so we need to re-mount it so that it looks at the updated value
     setKey(x => x + 1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentFeatures])
 
   return (

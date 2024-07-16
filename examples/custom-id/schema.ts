@@ -39,7 +39,6 @@ export const lists = {
       description: text({ validation: { isRequired: true } }),
       assignedTo: relationship({ ref: 'Person', many: false }),
       options: relationship({ ref: 'Option', many: true }),
-      products: relationship({ ref: 'Product', many: true }),
       orderedAt: timestamp(),
     },
     hooks: {
@@ -64,15 +63,6 @@ export const lists = {
           return { ...resolvedData, id: 3 }
         },
       },
-    },
-  }),
-  Product: list({
-    access: allowAll,
-    db: {
-      idField: { kind: 'uuid' },
-    },
-    fields: {
-      sku: text({ validation: { isRequired: true }, isIndexed: 'unique' }),
     },
   }),
 } satisfies Lists

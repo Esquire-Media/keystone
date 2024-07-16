@@ -12,11 +12,11 @@
   "dependencies": {
     "@graphql-tools/schema": "^9.0.0",
     "@keystone-6/core": "workspace:^",
-    "@prisma/client": "catalog:",
-    "graphql": "catalog:",
+    "@prisma/client": "^5.0.0",
+    "graphql": "^16.8.1",
     "nexus": "^1.3.0"
   },
   "devDependencies": {
-    "prisma": "catalog:"
+    "prisma": "^5.0.0"
   }
 }

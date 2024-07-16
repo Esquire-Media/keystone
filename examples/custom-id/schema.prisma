@@ -35,7 +35,6 @@ model Order {
   assignedTo   Person?   @relation("Order_assignedTo", fields: [assignedToId], references: [id])
   assignedToId String?   @map("assignedTo")
   options      Option[]  @relation("Order_options")
-  products     Product[] @relation("Order_products")
   orderedAt    DateTime?
 
   @@index([assignedToId])
@@ -45,10 +44,4 @@ model Option {
   id                 Int     @id
   description        String  @default("")
   from_Order_options Order[] @relation("Order_options")
-}
-
-model Product {
-  id                  String  @id @default(uuid())
-  sku                 String  @unique @default("")
-  from_Order_products Order[] @relation("Order_products")
 }

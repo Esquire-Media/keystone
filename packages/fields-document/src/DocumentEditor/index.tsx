@@ -41,27 +41,26 @@ import {
   createDocumentEditor
 } from './editor-shared'
 
-const styles = {
+const orderedListStyles = ['lower-roman', 'decimal', 'lower-alpha']
+const unorderedListStyles = ['square', 'disc', 'circle']
+
+let styles: any = {
   flex: 1,
-  'ol ol ol ol ol ol ol ol ol': { listStyle: 'lower-roman' },
-  'ol ol ol ol ol ol ol ol': { listStyle: 'lower-alpha' },
-  'ol ol ol ol ol ol ol': { listStyle: 'decimal' },
-  'ol ol ol ol ol ol': { listStyle: 'lower-roman' },
-  'ol ol ol ol ol': { listStyle: 'lower-alpha' },
-  'ol ol ol ol': { listStyle: 'decimal' },
-  'ol ol ol': { listStyle: 'lower-roman' },
-  'ol ol': { listStyle: 'lower-alpha' },
-  'ol': { listStyle: 'decimal' },
-  'ul ul ul ul ul ul ul ul ul': { listStyle: 'square' },
-  'ul ul ul ul ul ul ul ul': { listStyle: 'circle' },
-  'ul ul ul ul ul ul ul': { listStyle: 'disc' },
-  'ul ul ul ul ul ul': { listStyle: 'square' },
-  'ul ul ul ul ul': { listStyle: 'circle' },
-  'ul ul ul ul': { listStyle: 'disc' },
-  'ul ul ul': { listStyle: 'square' },
-  'ul ul': { listStyle: 'circle' },
-  'ul': { listStyle: 'disc' }
-} as const
+}
+
+let listDepth = 10
+
+while (listDepth--) {
+  let arr = Array.from({ length: listDepth })
+  if (arr.length) {
+    styles[arr.map(() => `ol`).join(' ')] = {
+      listStyle: orderedListStyles[listDepth % 3],
+    }
+    styles[arr.map(() => `ul`).join(' ')] = {
+      listStyle: unorderedListStyles[listDepth % 3],
+    }
+  }
+}
 
 const HOTKEYS: Record<string, Mark> = {
   'mod+b': 'bold',

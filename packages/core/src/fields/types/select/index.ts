@@ -2,15 +2,15 @@ import { classify } from 'inflection'
 import { humanize } from '../../../lib/utils'
 import {
   type BaseListTypeInfo,
-  type CommonFieldConfig,
-  type FieldTypeFunc,
   fieldType,
+  type FieldTypeFunc,
+  type CommonFieldConfig,
   orderDirectionEnum,
 } from '../../../types'
 import { graphql } from '../../..'
+import { assertReadIsNonNullAllowed, getResolvedIsNullable } from '../../non-null-graphql'
 import { filters } from '../../filters'
-import { makeValidateHook } from '../../non-null-graphql'
-import { mergeFieldHooks } from '../../resolve-hooks'
+import { type AdminSelectFieldMeta } from './views'
 
 export type SelectFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
   CommonFieldConfig<ListTypeInfo> &
@@ -51,62 +51,67 @@ export type SelectFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
       }
     }
 
-// these are the lowest and highest values for a signed 32-bit integer
+// These are the max and min values available to a 32 bit signed integer
 const MAX_INT = 2147483647
 const MIN_INT = -2147483648
 
-export function select <ListTypeInfo extends BaseListTypeInfo>(config: SelectFieldConfig<ListTypeInfo>): FieldTypeFunc<ListTypeInfo> {
-  const {
+export const select =
+  <ListTypeInfo extends BaseListTypeInfo>({
     isIndexed,
     ui: { displayMode = 'select', ...ui } = {},
     defaultValue,
     validation,
-  } = config
+    ...config
+  }: SelectFieldConfig<ListTypeInfo>): FieldTypeFunc<ListTypeInfo> =>
+  meta => {
+    const fieldLabel = config.label ?? humanize(meta.fieldKey)
+    const resolvedIsNullable = getResolvedIsNullable(validation, config.db)
+    assertReadIsNonNullAllowed(meta, config, resolvedIsNullable)
 
-  return (meta) => {
-    const options = config.options.map(option => {
-      if (typeof option === 'string') {
-        return {
-          label: humanize(option),
-          value: option,
-        }
+    const commonConfig = (
+      options: readonly { value: string | number, label: string }[]
+    ): CommonFieldConfig<ListTypeInfo> & {
+      __ksTelemetryFieldTypeName: string
+      views: string
+      getAdminMeta: () => AdminSelectFieldMeta
+    } => {
+      const values = new Set(options.map(x => x.value))
+      if (values.size !== options.length) {
+        throw new Error(
+          `The select field at ${meta.listKey}.${meta.fieldKey} has duplicate options, this is not allowed`
+        )
       }
-      return option
-    })
-
-    const accepted = new Set(options.map(x => x.value))
-    if (accepted.size !== options.length) {
-      throw new Error(`${meta.listKey}.${meta.fieldKey}: duplicate options, this is not allowed`)
-    }
-
-    const {
-      mode,
-      validate,
-    } = makeValidateHook(meta, config, ({ resolvedData, operation, addValidationError }) => {
-      if (operation === 'delete') return
-
-      const value = resolvedData[meta.fieldKey]
-      if (value != null && !accepted.has(value)) {
-        addValidationError(`value is not an accepted option`)
+      return {
+        ...config,
+        ui,
+        hooks: {
+          ...config.hooks,
+          async validateInput (args) {
+            const value = args.resolvedData[meta.fieldKey]
+            if (value != null && !values.has(value)) {
+              args.addValidationError(`${value} is not a possible value for ${fieldLabel}`)
+            }
+            if (
+              (validation?.isRequired || resolvedIsNullable === false) &&
+              (value === null || (value === undefined && args.operation === 'create'))
+            ) {
+              args.addValidationError(`${fieldLabel} is required`)
+            }
+            await config.hooks?.validateInput?.(args)
+          },
+        },
+        __ksTelemetryFieldTypeName: '@keystone-6/select',
+        views: '@keystone-6/core/fields/types/select/views',
+        getAdminMeta: () => ({
+          options,
+          type: config.type ?? 'string',
+          displayMode: displayMode,
+          defaultValue: defaultValue ?? null,
+          isRequired: validation?.isRequired ?? false,
+        }),
       }
-    })
-
-    const commonConfig = {
-      ...config,
-      mode,
-      ui,
-      hooks: mergeFieldHooks({ validate }, config.hooks),
-      __ksTelemetryFieldTypeName: '@keystone-6/select',
-      views: '@keystone-6/core/fields/types/select/views',
-      getAdminMeta: () => ({
-        options,
-        type: config.type ?? 'string',
-        displayMode: displayMode,
-        defaultValue: defaultValue ?? null,
-        isRequired: validation?.isRequired ?? false,
-      }),
     }
-
+    const mode = resolvedIsNullable === false ? 'required' : 'optional'
     const commonDbFieldConfig = {
       mode,
       index: isIndexed === true ? 'index' : isIndexed || undefined,
@@ -131,16 +136,19 @@ export function select <ListTypeInfo extends BaseListTypeInfo>(config: SelectFie
           ({ value }) => !Number.isInteger(value) || value > MAX_INT || value < MIN_INT
         )
       ) {
-        throw new Error(`${meta.listKey}.${meta.fieldKey} specifies integer values that are outside the range of a 32-bit signed integer`)
+        throw new Error(
+          `The select field at ${meta.listKey}.${meta.fieldKey} specifies integer values that are outside the range of a 32 bit signed integer`
+        )
       }
       return fieldType({
         kind: 'scalar',
         scalar: 'Int',
         ...commonDbFieldConfig,
       })({
-        ...commonConfig,
+        ...commonConfig(config.options),
         input: {
-          uniqueWhere: isIndexed === 'unique' ? { arg: graphql.arg({ type: graphql.Int }) } : undefined,
+          uniqueWhere:
+            isIndexed === 'unique' ? { arg: graphql.arg({ type: graphql.Int }) } : undefined,
           where: {
             arg: graphql.arg({ type: filters[meta.provider].Int[mode] }),
             resolve: mode === 'required' ? undefined : filters.resolveCommon,
@@ -158,26 +166,33 @@ export function select <ListTypeInfo extends BaseListTypeInfo>(config: SelectFie
         output: graphql.field({ type: graphql.Int }),
       })
     }
+    const options = config.options.map(option => {
+      if (typeof option === 'string') {
+        return {
+          label: humanize(option),
+          value: option,
+        }
+      }
+      return option
+    })
 
     if (config.type === 'enum') {
       const enumName = `${meta.listKey}${classify(meta.fieldKey)}Type`
-      const enumValues = options.map(x => `${x.value}`)
-
       const graphQLType = graphql.enum({
         name: enumName,
-        values: graphql.enumValues(enumValues),
+        values: graphql.enumValues(options.map(x => x.value)),
       })
       return fieldType(
         meta.provider === 'sqlite'
           ? { kind: 'scalar', scalar: 'String', ...commonDbFieldConfig }
           : {
               kind: 'enum',
-              values: enumValues,
+              values: options.map(x => x.value),
               name: enumName,
               ...commonDbFieldConfig,
             }
       )({
-        ...commonConfig,
+        ...commonConfig(options),
         input: {
           uniqueWhere:
             isIndexed === 'unique' ? { arg: graphql.arg({ type: graphQLType }) } : undefined,
@@ -198,9 +213,8 @@ export function select <ListTypeInfo extends BaseListTypeInfo>(config: SelectFie
         output: graphql.field({ type: graphQLType }),
       })
     }
-
     return fieldType({ kind: 'scalar', scalar: 'String', ...commonDbFieldConfig })({
-      ...commonConfig,
+      ...commonConfig(options),
       input: {
         uniqueWhere:
           isIndexed === 'unique' ? { arg: graphql.arg({ type: graphql.String }) } : undefined,
@@ -221,4 +235,3 @@ export function select <ListTypeInfo extends BaseListTypeInfo>(config: SelectFie
       output: graphql.field({ type: graphql.String }),
     })
   }
-}

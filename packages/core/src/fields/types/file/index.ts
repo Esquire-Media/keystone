@@ -7,7 +7,6 @@ import {
   fieldType,
 } from '../../../types'
 import { graphql } from '../../..'
-import { mergeFieldHooks, type InternalFieldHooks } from '../../resolve-hooks'
 
 export type FileFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
   CommonFieldConfig<ListTypeInfo> & {
@@ -56,32 +55,13 @@ export function file <ListTypeInfo extends BaseListTypeInfo> (config: FileFieldC
     const storage = meta.getStorage(config.storage)
 
     if (!storage) {
-      throw new Error(`${meta.listKey}.${fieldKey} has storage set to ${config.storage}, but no storage configuration was found for that key`)
+      throw new Error(
+        `${meta.listKey}.${fieldKey} has storage set to ${config.storage}, but no storage configuration was found for that key`
+      )
     }
 
     if ('isIndexed' in config) {
       throw Error("isIndexed: 'unique' is not a supported option for field type file")
-    }
-
-    const hooks: InternalFieldHooks<ListTypeInfo> = {}
-    if (!storage.preserve) {
-      hooks.beforeOperation = async function (args) {
-        if (args.operation === 'update' || args.operation === 'delete') {
-          const filenameKey = `${fieldKey}_filename`
-          const filename = args.item[filenameKey]
-
-          // this will occur on an update where a file already existed but has been
-          // changed, or on a delete, where there is no longer an item
-          if (
-            (args.operation === 'delete' ||
-              typeof args.resolvedData[fieldKey].filename === 'string' ||
-              args.resolvedData[fieldKey].filename === null) &&
-            typeof filename === 'string'
-          ) {
-            await args.context.files(config.storage).deleteAtSource(filename)
-          }
-        }
-      }
     }
 
     return fieldType({
@@ -93,7 +73,29 @@ export function file <ListTypeInfo extends BaseListTypeInfo> (config: FileFieldC
       },
     })({
       ...config,
-      hooks: mergeFieldHooks(hooks, config.hooks),
+      hooks: storage.preserve
+        ? config.hooks
+        : {
+            ...config.hooks,
+            async beforeOperation (args) {
+              await config.hooks?.beforeOperation?.(args)
+              if (args.operation === 'update' || args.operation === 'delete') {
+                const filenameKey = `${fieldKey}_filename`
+                const filename = args.item[filenameKey]
+
+                // This will occur on an update where a file already existed but has been
+                // changed, or on a delete, where there is no longer an item
+                if (
+                  (args.operation === 'delete' ||
+                    typeof args.resolvedData[fieldKey].filename === 'string' ||
+                    args.resolvedData[fieldKey].filename === null) &&
+                  typeof filename === 'string'
+                ) {
+                  await args.context.files(config.storage).deleteAtSource(filename)
+                }
+              }
+            },
+          },
       input: {
         create: {
           arg: inputArg,

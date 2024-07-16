@@ -127,6 +127,7 @@ export const ToastElement = forwardRef<HTMLDivElement, ToastElementProps>((props
     }
     // this is not like other components because the consumer cannot update the props once they `addToast()`
     // we intentionally only want this to be run when the toast element mounts/unmounts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const iconElement = {

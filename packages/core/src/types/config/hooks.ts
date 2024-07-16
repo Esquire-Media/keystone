@@ -234,7 +234,7 @@ type ResolveInputFieldHook<
   ListTypeInfo['prisma']['create' | 'update'][FieldKey] | undefined // undefined represents 'don't do anything'
 >
 
-export type ValidateHook<
+type ValidateHook<
   ListTypeInfo extends BaseListTypeInfo,
   Operation extends 'create' | 'update' | 'delete'
 > = (
@@ -276,7 +276,7 @@ export type ValidateHook<
     CommonArgs<ListTypeInfo>
 ) => MaybePromise<void>
 
-export type ValidateFieldHook<
+type ValidateFieldHook<
   ListTypeInfo extends BaseListTypeInfo,
   Operation extends 'create' | 'update' | 'delete',
   FieldKey extends ListTypeInfo['fields']

@@ -1,14 +1,18 @@
+import { humanize } from '../../../lib/utils'
 import {
   type BaseListTypeInfo,
+  fieldType,
   type FieldTypeFunc,
   type CommonFieldConfig,
-  fieldType,
   orderDirectionEnum,
 } from '../../../types'
 import { graphql } from '../../..'
+import {
+  assertReadIsNonNullAllowed,
+  getResolvedIsNullable,
+  resolveHasValidation,
+} from '../../non-null-graphql'
 import { filters } from '../../filters'
-import { makeValidateHook } from '../../non-null-graphql'
-import { mergeFieldHooks } from '../../resolve-hooks'
 import { type TimestampFieldMeta } from './views'
 
 export type TimestampFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
@@ -41,7 +45,11 @@ export function timestamp <ListTypeInfo extends BaseListTypeInfo> (
       try {
         graphql.DateTime.graphQLType.parseValue(defaultValue)
       } catch (err) {
-        throw new Error(`${meta.listKey}.${meta.fieldKey}.defaultValue is required to be an ISO8601 date-time string such as ${new Date().toISOString()}`)
+        throw new Error(
+          `The timestamp field at ${meta.listKey}.${
+            meta.fieldKey
+          } specifies defaultValue: ${defaultValue} but values must be provided as a full ISO8601 date-time string such as ${new Date().toISOString()}`
+        )
       }
     }
 
@@ -49,10 +57,12 @@ export function timestamp <ListTypeInfo extends BaseListTypeInfo> (
       typeof defaultValue === 'string'
         ? (graphql.DateTime.graphQLType.parseValue(defaultValue) as Date)
         : defaultValue
-    const {
-      mode,
-      validate,
-    } = makeValidateHook(meta, config)
+    const resolvedIsNullable = getResolvedIsNullable(validation, config.db)
+
+    assertReadIsNonNullAllowed(meta, config, resolvedIsNullable)
+    const mode = resolvedIsNullable === false ? 'required' : 'optional'
+    const fieldLabel = config.label ?? humanize(meta.fieldKey)
+    const hasValidation = resolveHasValidation(config)
 
     return fieldType({
       kind: 'scalar',
@@ -73,7 +83,17 @@ export function timestamp <ListTypeInfo extends BaseListTypeInfo> (
       extendPrismaSchema: config.db?.extendPrismaSchema,
     })({
       ...config,
-      hooks: mergeFieldHooks({ validate }, config.hooks),
+      hooks: {
+        ...config.hooks,
+        validateInput: hasValidation ? async (args) => {
+          const value = args.resolvedData[meta.fieldKey]
+          if ((validation?.isRequired || resolvedIsNullable === false) && value === null) {
+            args.addValidationError(`${fieldLabel} is required`)
+          }
+
+          await config.hooks?.validateInput?.(args)
+        } : config.hooks?.validateInput,
+      },
       input: {
         uniqueWhere: isIndexed === 'unique' ? { arg: graphql.arg({ type: graphql.DateTime }) } : undefined,
         where: {

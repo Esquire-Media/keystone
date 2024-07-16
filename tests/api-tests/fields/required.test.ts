@@ -6,6 +6,7 @@ import { list } from '@keystone-6/core'
 import { text } from '@keystone-6/core/fields'
 import { setupTestRunner } from '@keystone-6/api-tests/test-runner'
 import { allowAll } from '@keystone-6/core/access'
+import { humanize } from '../../../packages/core/src/lib/utils'
 import {
   dbProvider,
   expectValidationError
@@ -52,11 +53,6 @@ for (const modulePath of testModules) {
               fields: {
                 name: text(),
                 testField: mod.typeFunction({
-                  ...(mod.nonNullableDefault ? {
-                    db: {
-                      isNullable: true
-                    }
-                  } : {}),
                   ...fieldConfig,
                   validation: {
                     ...fieldConfig.validation,
@@ -89,22 +85,23 @@ for (const modulePath of testModules) {
         },
       })
 
-      const messages = [`Test.testField: missing value`]
+      const messages = [`Test.testField: ${humanize('testField')} is required`]
 
       test(
         'Create an object without the required field',
         runner(async ({ context }) => {
           const { data, errors } = await context.graphql.raw({
             query: `
-              mutation {
-                createTest(data: { name: "test entry" } ) { id }
-              }`,
+                mutation {
+                  createTest(data: { name: "test entry" } ) { id }
+                }`,
           })
           expect(data).toEqual({ createTest: null })
           expectValidationError(errors, [
             {
               path: ['createTest'],
-              messages,
+              messages:
+                mod.name === 'Text' ? ['Test.testField: Test Field must not be empty'] : messages,
             },
           ])
         })
@@ -115,9 +112,9 @@ for (const modulePath of testModules) {
         runner(async ({ context }) => {
           const { data, errors } = await context.graphql.raw({
             query: `
-              mutation {
-                createTest(data: { name: "test entry", testField: null } ) { id }
-              }`,
+                mutation {
+                  createTest(data: { name: "test entry", testField: null } ) { id }
+                }`,
           })
           expect(data).toEqual({ createTest: null })
           expectValidationError(errors, [

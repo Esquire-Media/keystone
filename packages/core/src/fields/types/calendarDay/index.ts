@@ -1,15 +1,15 @@
+import { humanize } from '../../../lib/utils'
 import {
   type BaseListTypeInfo,
-  type CommonFieldConfig,
-  type FieldTypeFunc,
   fieldType,
+  type FieldTypeFunc,
+  type CommonFieldConfig,
   orderDirectionEnum,
 } from '../../../types'
-import { type CalendarDayFieldMeta } from './views'
 import { graphql } from '../../..'
+import { assertReadIsNonNullAllowed, getResolvedIsNullable } from '../../non-null-graphql'
 import { filters } from '../../filters'
-import { makeValidateHook } from '../../non-null-graphql'
-import { mergeFieldHooks } from '../../resolve-hooks'
+import { type CalendarDayFieldMeta } from './views'
 
 export type CalendarDayFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
   CommonFieldConfig<ListTypeInfo> & {
@@ -25,13 +25,14 @@ export type CalendarDayFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
     }
   }
 
-export function calendarDay <ListTypeInfo extends BaseListTypeInfo>(config: CalendarDayFieldConfig<ListTypeInfo> = {}): FieldTypeFunc<ListTypeInfo> {
-  const {
+export const calendarDay =
+  <ListTypeInfo extends BaseListTypeInfo>({
     isIndexed,
     validation,
     defaultValue,
-  } = config
-  return (meta) => {
+    ...config
+  }: CalendarDayFieldConfig<ListTypeInfo> = {}): FieldTypeFunc<ListTypeInfo> =>
+  meta => {
     if (typeof defaultValue === 'string') {
       try {
         graphql.CalendarDay.graphQLType.parseValue(defaultValue)
@@ -42,6 +43,11 @@ export function calendarDay <ListTypeInfo extends BaseListTypeInfo>(config: Cale
       }
     }
 
+    const resolvedIsNullable = getResolvedIsNullable(validation, config.db)
+    assertReadIsNonNullAllowed(meta, config, resolvedIsNullable)
+
+    const mode = resolvedIsNullable === false ? 'required' : 'optional'
+    const fieldLabel = config.label ?? humanize(meta.fieldKey)
     const usesNativeDateType = meta.provider === 'postgresql' || meta.provider === 'mysql'
 
     function resolveInput (value: string | null | undefined) {
@@ -51,10 +57,6 @@ export function calendarDay <ListTypeInfo extends BaseListTypeInfo>(config: Cale
       return dateStringToDateObjectInUTC(value)
     }
 
-    const {
-      mode,
-      validate,
-    } = makeValidateHook(meta, config)
     const commonResolveFilter = mode === 'optional' ? filters.resolveCommon : <T>(x: T) => x
 
     return fieldType({
@@ -74,7 +76,17 @@ export function calendarDay <ListTypeInfo extends BaseListTypeInfo>(config: Cale
       nativeType: usesNativeDateType ? 'Date' : undefined,
     })({
       ...config,
-      hooks: mergeFieldHooks({ validate }, config.hooks),
+      hooks: {
+        ...config.hooks,
+        async validateInput (args) {
+          const value = args.resolvedData[meta.fieldKey]
+          if ((validation?.isRequired || resolvedIsNullable === false) && value === null) {
+            args.addValidationError(`${fieldLabel} is required`)
+          }
+
+          await config.hooks?.validateInput?.(args)
+        },
+      },
       input: {
         uniqueWhere:
           isIndexed === 'unique'
@@ -125,7 +137,6 @@ export function calendarDay <ListTypeInfo extends BaseListTypeInfo>(config: Cale
       },
     })
   }
-}
 
 function dateStringToDateObjectInUTC (value: string) {
   return new Date(`${value}T00:00Z`)

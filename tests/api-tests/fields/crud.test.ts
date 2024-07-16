@@ -4,6 +4,7 @@ import { text } from '@keystone-6/core/fields'
 import { type KeystoneContext } from '@keystone-6/core/types'
 import { setupTestRunner } from '@keystone-6/api-tests/test-runner'
 import { allowAll } from '@keystone-6/core/access'
+import { humanize } from '../../../packages/core/src/lib/utils'
 import {
   dbProvider,
   expectSingleResolverError,
@@ -220,7 +221,7 @@ for (const modulePath of testModules) {
                       expectValidationError(errors, [
                         {
                           path: [updateMutationName],
-                          messages: [`Test.${fieldName}: missing value`],
+                          messages: [`Test.${fieldName}: ${humanize(fieldName)} is required`],
                         },
                       ])
                     }

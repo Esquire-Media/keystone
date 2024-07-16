@@ -1,17 +1,14 @@
+import { humanize } from '../../../lib/utils'
 import {
   type BaseListTypeInfo,
-  type CommonFieldConfig,
-  type FieldTypeFunc,
   fieldType,
+  type FieldTypeFunc,
+  type CommonFieldConfig,
   orderDirectionEnum,
 } from '../../../types'
 import { graphql } from '../../..'
+import { assertReadIsNonNullAllowed, getResolvedIsNullable } from '../../non-null-graphql'
 import { filters } from '../../filters'
-import {
-  resolveDbNullable,
-  makeValidateHook
-} from '../../non-null-graphql'
-import { mergeFieldHooks } from '../../resolve-hooks'
 
 export type IntegerFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
   CommonFieldConfig<ListTypeInfo> & {
@@ -29,87 +26,82 @@ export type IntegerFieldConfig<ListTypeInfo extends BaseListTypeInfo> =
     }
   }
 
-// these are the lowest and highest values for a signed 32-bit integer
+// These are the max and min values available to a 32 bit signed integer
 const MAX_INT = 2147483647
 const MIN_INT = -2147483648
 
-export function integer <ListTypeInfo extends BaseListTypeInfo> (config: IntegerFieldConfig<ListTypeInfo> = {}): FieldTypeFunc<ListTypeInfo> {
-  const {
-    defaultValue: _defaultValue,
-    isIndexed,
-    validation = {},
-  } = config
-
-  const {
-    isRequired = false,
-    min,
-    max
-  } = validation
-
-  return (meta) => {
+export function integer <ListTypeInfo extends BaseListTypeInfo> ({
+  isIndexed,
+  defaultValue: _defaultValue,
+  validation,
+  ...config
+}: IntegerFieldConfig<ListTypeInfo> = {}): FieldTypeFunc<ListTypeInfo> {
+  return meta => {
     const defaultValue = _defaultValue ?? null
     const hasAutoIncDefault =
       typeof defaultValue == 'object' &&
       defaultValue !== null &&
       defaultValue.kind === 'autoincrement'
 
+    const isNullable = getResolvedIsNullable(validation, config.db)
+
     if (hasAutoIncDefault) {
       if (meta.provider === 'sqlite' || meta.provider === 'mysql') {
-        throw new Error(`${meta.listKey}.${meta.fieldKey} specifies defaultValue: { kind: 'autoincrement' }, this is not supported on ${meta.provider}`)
+        throw new Error(
+          `The integer field at ${meta.listKey}.${meta.fieldKey} specifies defaultValue: { kind: 'autoincrement' }, this is not supported on ${meta.provider}`
+        )
       }
-      const isNullable = resolveDbNullable(validation, config.db)
       if (isNullable !== false) {
         throw new Error(
-          `${meta.listKey}.${meta.fieldKey} specifies defaultValue: { kind: 'autoincrement' } but doesn't specify db.isNullable: false.\n` +
+          `The integer field at ${meta.listKey}.${meta.fieldKey} specifies defaultValue: { kind: 'autoincrement' } but doesn't specify db.isNullable: false.\n` +
             `Having nullable autoincrements on Prisma currently incorrectly creates a non-nullable column so it is not allowed.\n` +
             `https://github.com/prisma/prisma/issues/8663`
         )
       }
     }
-    if (min !== undefined && !Number.isInteger(min)) {
-      throw new Error(`${meta.listKey}.${meta.fieldKey} specifies validation.min: ${min} but it must be an integer`)
+
+    if (validation?.min !== undefined && !Number.isInteger(validation.min)) {
+      throw new Error(
+        `The integer field at ${meta.listKey}.${meta.fieldKey} specifies validation.min: ${validation.min} but it must be an integer`
+      )
     }
-    if (max !== undefined && !Number.isInteger(max)) {
-      throw new Error(`${meta.listKey}.${meta.fieldKey} specifies validation.max: ${max} but it must be an integer`)
+    if (validation?.max !== undefined && !Number.isInteger(validation.max)) {
+      throw new Error(
+        `The integer field at ${meta.listKey}.${meta.fieldKey} specifies validation.max: ${validation.max} but it must be an integer`
+      )
     }
-    if (min !== undefined && (min > MAX_INT || min < MIN_INT)) {
-      throw new Error(`${meta.listKey}.${meta.fieldKey} specifies validation.min: ${min} which is outside of the range of a 32-bit signed integer`)
+
+    if (validation?.min !== undefined && (validation?.min > MAX_INT || validation?.min < MIN_INT)) {
+      throw new Error(
+        `The integer field at ${meta.listKey}.${meta.fieldKey} specifies validation.min: ${validation.min} which is outside of the range of a 32bit signed integer(${MIN_INT} - ${MAX_INT}) which is not allowed`
+      )
     }
-    if (max !== undefined && (max > MAX_INT || max < MIN_INT)) {
-      throw new Error(`${meta.listKey}.${meta.fieldKey} specifies validation.max: ${max} which is outside of the range of a 32-bit signed integer`)
+    if (validation?.max !== undefined && (validation?.max > MAX_INT || validation?.max < MIN_INT)) {
+      throw new Error(
+        `The integer field at ${meta.listKey}.${meta.fieldKey} specifies validation.max: ${validation.max} which is outside of the range of a 32bit signed integer(${MIN_INT} - ${MAX_INT}) which is not allowed`
+      )
     }
+
     if (
-      min !== undefined &&
-      max !== undefined &&
-      min > max
+      validation?.min !== undefined &&
+      validation?.max !== undefined &&
+      validation.min > validation.max
     ) {
-      throw new Error(`${meta.listKey}.${meta.fieldKey} specifies a validation.max that is less than the validation.min, and therefore has no valid options`)
+      throw new Error(
+        `The integer field at ${meta.listKey}.${meta.fieldKey} specifies a validation.max that is less than the validation.min, and therefore has no valid options`
+      )
     }
 
-    const hasAdditionalValidation = min !== undefined || max !== undefined
-    const {
-      mode,
-      validate,
-    } = makeValidateHook(meta, config, hasAdditionalValidation ? ({ resolvedData, operation, addValidationError }) => {
-      if (operation === 'delete') return
+    assertReadIsNonNullAllowed(meta, config, isNullable)
 
-      const value = resolvedData[meta.fieldKey]
-      if (typeof value === 'number') {
-        if (min !== undefined && value < min) {
-          addValidationError(`value must be greater than or equal to ${min}`)
-        }
-
-        if (max !== undefined && value > max) {
-          addValidationError(`value must be less than or equal to ${max}`)
-        }
-      }
-    } : undefined)
+    const mode = isNullable === false ? 'required' : 'optional'
+    const fieldLabel = config.label ?? humanize(meta.fieldKey)
 
     return fieldType({
       kind: 'scalar',
       mode,
       scalar: 'Int',
-      // this will resolve to 'index' if the boolean is true, otherwise other values - false will be converted to undefined
+      // This will resolve to 'index' if the boolean is true, otherwise other values - false will be converted to undefined
       index: isIndexed === true ? 'index' : isIndexed || undefined,
       default:
         typeof defaultValue === 'number'
@@ -121,7 +113,34 @@ export function integer <ListTypeInfo extends BaseListTypeInfo> (config: Integer
       extendPrismaSchema: config.db?.extendPrismaSchema,
     })({
       ...config,
-      hooks: mergeFieldHooks({ validate }, config.hooks),
+      hooks: {
+        ...config.hooks,
+        async validateInput (args) {
+          const value = args.resolvedData[meta.fieldKey]
+
+          if (
+            (validation?.isRequired || isNullable === false) &&
+            (value === null || (args.operation === 'create' && value === undefined && !hasAutoIncDefault))
+          ) {
+            args.addValidationError(`${fieldLabel} is required`)
+          }
+          if (typeof value === 'number') {
+            if (validation?.min !== undefined && value < validation.min) {
+              args.addValidationError(
+                `${fieldLabel} must be greater than or equal to ${validation.min}`
+              )
+            }
+
+            if (validation?.max !== undefined && value > validation.max) {
+              args.addValidationError(
+                `${fieldLabel} must be less than or equal to ${validation.max}`
+              )
+            }
+          }
+
+          await config.hooks?.validateInput?.(args)
+        },
+      },
       input: {
         uniqueWhere: isIndexed === 'unique' ? { arg: graphql.arg({ type: graphql.Int }) } : undefined,
         where: {
@@ -149,9 +168,9 @@ export function integer <ListTypeInfo extends BaseListTypeInfo> (config: Integer
       getAdminMeta () {
         return {
           validation: {
-            min: min ?? MIN_INT,
-            max: max ?? MAX_INT,
-            isRequired,
+            min: validation?.min ?? MIN_INT,
+            max: validation?.max ?? MAX_INT,
+            isRequired: validation?.isRequired ?? false,
           },
           defaultValue:
             defaultValue === null || typeof defaultValue === 'number'

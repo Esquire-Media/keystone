@@ -11,13 +11,14 @@
   },
   "dependencies": {
     "@keystone-6/core": "workspace:^",
-    "@prisma/client": "catalog:",
-    "next": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "@keystone-ui/core": "workspace:^",
+    "@prisma/client": "^5.0.0",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "prisma": "catalog:",
-    "typescript": "catalog:"
+    "prisma": "^5.0.0",
+    "typescript": "~5.0.0"
   }
 }

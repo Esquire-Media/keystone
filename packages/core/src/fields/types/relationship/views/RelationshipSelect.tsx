@@ -2,24 +2,16 @@
 /** @jsx jsx */
 
 import 'intersection-observer'
-import {
-  type RefObject,
-  useEffect,
-  useMemo,
-  useState,
-  createContext,
-  useContext,
-  useRef
-} from 'react'
+import { type RefObject, useEffect, useMemo, useState, createContext, useContext, useRef } from 'react'
 
 import { jsx } from '@keystone-ui/core'
 import { MultiSelect, Select, selectComponents } from '@keystone-ui/fields'
-import { type ListMeta } from '../../../../types'
+import type { ListMeta } from '../../../../types'
 import {
-  type TypedDocumentNode,
   ApolloClient,
   gql,
   InMemoryCache,
+  type TypedDocumentNode,
   useApolloClient,
   useQuery,
 } from '../../../../admin-ui/apollo'
@@ -65,35 +57,24 @@ function isBigInt (x: string) {
   }
 }
 
-// TODO: this is unfortunate, remove in breaking change?
-function isUuid (x: unknown) {
-  if (typeof x !== 'string') return
-  if (x.length !== 36) return
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x)
-}
-
-export function useFilter (value: string, list: ListMeta, searchFields: string[]) {
+export function useFilter (search: string, list: ListMeta, searchFields: string[]) {
   return useMemo(() => {
-    const trimmedSearch = value.trim()
+    const trimmedSearch = search.trim()
     if (!trimmedSearch.length) return { OR: [] }
 
     const conditions: Record<string, any>[] = []
-    const idField = list.fields.id.fieldMeta as { type: string, kind: string }
-    console.error({ idField, value, meta: list.fields.id.fieldMeta })
-
-    if (idField.type === 'String') {
-      // TODO: remove in breaking change?
-      if (idField.kind === 'uuid') {
-        if (isUuid(value)) {
-          conditions.push({ id: { equals: trimmedSearch } })
-        }
-      } else {
-        conditions.push({ id: { equals: trimmedSearch } })
-      }
-    } else if (idField.type === 'Int' && isInt(trimmedSearch)) {
+    const { type: idFieldType } = (list.fields.id.fieldMeta as any) ?? {}
+    if (idFieldType === 'String') {
+      conditions.push({ id: { equals: trimmedSearch } })
+    } else if (idFieldType === 'Int' && isInt(trimmedSearch)) {
       conditions.push({ id: { equals: Number(trimmedSearch) } })
+    } else if (idFieldType === 'BigInt' && isBigInt(trimmedSearch)) {
+      conditions.push({ id: { equals: trimmedSearch } })
+    } else if (idFieldType === 'UUID') {
+      conditions.push({ id: { equals: trimmedSearch } }) // TODO: remove in breaking change?
+    }
 
-    } else if (idField.type === 'BigInt' && isBigInt(trimmedSearch)) {
+    if ((list.fields.id.fieldMeta as any)?.type === 'String') {
       conditions.push({ id: { equals: trimmedSearch } })
     }
 
@@ -108,7 +89,7 @@ export function useFilter (value: string, list: ListMeta, searchFields: string[]
     }
 
     return { OR: conditions }
-  }, [value, list, searchFields])
+  }, [search, list, searchFields])
 }
 
 const idFieldAlias = '____id____'

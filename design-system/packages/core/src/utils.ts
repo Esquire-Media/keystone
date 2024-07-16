@@ -129,6 +129,7 @@ export const useId = (idFromProps?: string | null) => {
     if (id === null) {
       setId(genId())
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

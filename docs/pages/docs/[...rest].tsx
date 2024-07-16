@@ -1,3 +1,4 @@
+import path from 'path'
 import React from 'react'
 import {
   type GetStaticPathsResult,
@@ -6,13 +7,11 @@ import {
   type InferGetStaticPropsType,
 } from 'next'
 import { useRouter } from 'next/router'
-import { type DocsContent } from '../../markdoc'
+import { globby } from 'globby'
+import { type DocsContent, readDocsContent } from '../../markdoc'
 import { extractHeadings, Markdoc } from '../../components/Markdoc'
 import { DocsPage } from '../../components/Page'
 import { Heading } from '../../components/docs/Heading'
-import { reader } from '../../lib/keystatic-reader'
-import { transform } from '@markdoc/markdoc'
-import { baseMarkdocConfig } from '../../markdoc/config'
 
 export default function DocPage (props: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter()
@@ -38,9 +37,11 @@ export default function DocPage (props: InferGetStaticPropsType<typeof getStatic
 }
 
 export async function getStaticPaths (): Promise<GetStaticPathsResult> {
-  const pages = await reader.collections.docs.list()
+  const files = await globby('**/*.md', {
+    cwd: path.join(process.cwd(), 'pages/docs'),
+  })
   return {
-    paths: pages.map(page => ({ params: { rest: page.split('/') } })),
+    paths: files.map(file => ({ params: { rest: file.replace(/\.md$/, '').split('/') } })),
     fallback: false,
   }
 }
@@ -48,13 +49,5 @@ export async function getStaticPaths (): Promise<GetStaticPathsResult> {
 export async function getStaticProps (
   args: GetStaticPropsContext<{ rest: string[] }>
 ): Promise<GetStaticPropsResult<DocsContent>> {
-  const doc = await reader.collections.docs.read(args.params!.rest.join('/'), {
-    resolveLinkedFiles: true,
-  })
-
-  if (!doc) throw new Error(`Doc page not found: ${args.params!.rest.join('/')}`)
-
-  const transformedContent = transform(doc.content.node, baseMarkdocConfig)
-
-  return { props: { ...doc, content: JSON.parse(JSON.stringify(transformedContent)) } }
+  return { props: await readDocsContent(`pages/docs/${args.params!.rest.join('/')}.md`) }
 }

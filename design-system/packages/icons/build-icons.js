@@ -1,6 +1,7 @@
 const path = require('node:path')
 const fs = require('node:fs/promises')
 
+/* eslint-disable import/no-extraneous-dependencies */
 const svgr = require('@svgr/core').default
 const { icons } = require('feather-icons')
 const toPascalCase = require('to-pascal-case')
