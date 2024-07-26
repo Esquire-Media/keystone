@@ -355,7 +355,7 @@ type RelationshipController = FieldController<
   many: boolean
 }
 
-export const controller = (
+export function controller (
   config: FieldControllerConfig<
     {
       refFieldKey?: string
@@ -382,7 +382,7 @@ export const controller = (
         }
     )
   >
-): RelationshipController => {
+): RelationshipController {
   const cardsDisplayOptions =
     config.fieldMeta.displayMode === 'cards'
       ? {
