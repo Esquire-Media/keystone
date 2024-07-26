@@ -1,5 +1,5 @@
 {
-  "name": "@keystone-6/example-document-field",
+  "name": "@keystone-6/example-query-builder-field",
   "version": "0.1.3",
   "private": true,
   "license": "MIT",
@@ -13,10 +13,10 @@
     "@keystone-6/core": "workspace:^",
     "@keystone-6/document-renderer": "workspace:^",
     "@keystone-6/fields-query-builder": "workspace:^",
-    "@prisma/client": "^5.0.0"
+    "@prisma/client": "catalog:"
   },
   "devDependencies": {
-    "prisma": "^5.0.0",
-    "typescript": "~5.0.0"
+    "prisma": "catalog:",
+    "typescript": "catalog:"
   }
 }
